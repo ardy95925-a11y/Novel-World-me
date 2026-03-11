@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>The Unknown Entity — The Shelf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cinzel:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #0f0d0b;
+      --paper:    #f5f0e8;
+      --cream:    #ede6d8;
+      --warm:     #c8b99a;
+      --accent:   #5c3d2e;
+      --muted:    #8a7560;
+      --rule:     #d4c8b4;
+      --bg-dark:  #111009;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'EB Garamond', Georgia, serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── Nav Bar ── */
+    .topnav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 56px;
+      background: rgba(245, 240, 232, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .nav-back {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-back::before { content: '←'; font-family: Georgia, serif; font-size: 14px; letter-spacing: 0; }
+    .nav-back:hover { color: var(--accent); }
+
+    .nav-title {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Font Size Control */
+    .font-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .font-btn {
+      background: none;
+      border: 1px solid var(--rule);
+      color: var(--muted);
+      font-family: 'EB Garamond', serif;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 2px;
+      font-size: 16px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .font-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Book Cover Hero ── */
+    .hero {
+      background: var(--bg-dark);
+      padding: 120px 48px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 100%, rgba(92,61,46,0.35) 0%, transparent 70%),
+        repeating-linear-gradient(
+          -60deg,
+          transparent,
+          transparent 8px,
+          rgba(255,255,255,0.012) 8px,
+          rgba(255,255,255,0.012) 9px
+        );
+      pointer-events: none;
+    }
+
+    .hero-ornament {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      color: rgba(200,185,154,0.35);
+      letter-spacing: 0.5em;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .hero-genre {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--warm);
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(42px, 7vw, 72px);
+      line-height: 1.05;
+      color: #f0ebe0;
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .hero-author {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 18px;
+      color: rgba(200,185,154,0.6);
+      position: relative;
+      margin-bottom: 56px;
+    }
+
+    .hero-rule {
+      width: 60px;
+      height: 1px;
+      background: rgba(200,185,154,0.3);
+      position: relative;
+    }
+
+    /* ── Chapter Navigation Sidebar ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 48px;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 72px;
+      padding: 48px 0;
+    }
+
+    .toc-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .toc-list a {
+      font-family: 'EB Garamond', serif;
+      font-size: 15px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 12px;
+      display: block;
+      border-left: 1px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      line-height: 1.4;
+    }
+
+    .toc-list a:hover,
+    .toc-list a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+
+    /* ── Reading Column ── */
+    .reading-col {
+      padding: 64px 0 120px;
+    }
+
+    /* Chapter */
+    .chapter {
+      margin-bottom: 80px;
+    }
+
+    .chapter-header {
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .chapter-num {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .chapter-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 38px;
+      line-height: 1.15;
+      color: var(--ink);
+    }
+
+    .chapter-epigraph {
+      margin-top: 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 18px;
+      color: var(--muted);
+      padding-left: 24px;
+      border-left: 2px solid var(--rule);
+    }
+
+    /* Prose */
+    .prose {
+      --font-size: 20px;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: var(--font-size);
+      line-height: 1.85;
+      color: #2a2218;
+    }
+
+    .prose p {
+      margin-bottom: 1.5em;
+      text-align: justify;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+    }
+
+    .prose p:first-of-type::first-letter {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4.5em;
+      font-weight: 300;
+      line-height: 0.8;
+      float: left;
+      margin-right: 0.08em;
+      margin-top: 0.05em;
+      color: var(--accent);
+    }
+
+    .prose p + p { text-indent: 1.5em; }
+    .prose p:first-of-type { text-indent: 0; }
+
+    .prose em { font-style: italic; color: #3a3020; }
+    .prose strong { font-weight: 600; }
+
+    /* Dialogue */
+    .prose .dialogue {
+      padding: 4px 0;
+    }
+
+    /* Scene break */
+    .scene-break {
+      text-align: center;
+      color: var(--warm);
+      letter-spacing: 0.5em;
+      font-size: 14px;
+      margin: 2.5em 0;
+      user-select: none;
+    }
+
+    /* Chapter End Mark */
+    .chapter-end {
+      text-align: center;
+      color: var(--warm);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      margin-top: 56px;
+      opacity: 0.6;
+    }
+
+    /* ── Coming Next ── */
+    .coming-next {
+      margin-top: 80px;
+      padding: 48px;
+      background: var(--cream);
+      border: 1px solid var(--rule);
+      text-align: center;
+    }
+
+    .coming-label {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .coming-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 28px;
+      color: var(--ink);
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 40px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--rule);
+      border-top: 1px solid var(--rule);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .topnav { padding: 0 20px; }
+      .nav-title { display: none; }
+      .hero { padding: 100px 24px 60px; }
+      .layout {
+        grid-template-columns: 1fr;
+        padding: 0 24px;
+        gap: 0;
+      }
+      .toc { display: none; }
+      .reading-col { padding: 40px 0 80px; }
+      .coming-next { margin: 40px -24px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <a class="nav-back" href="../index.html">Library</a>
+    <span class="nav-title">The Unknown Entity</span>
+    <div class="font-controls">
+      <button class="font-btn" id="font-down" aria-label="Decrease font size">A−</button>
+      <button class="font-btn" id="font-up" aria-label="Increase font size">A+</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+    <div class="hero-genre">Dark Fantasy · Supernatural Horror</div>
+    <h1 class="hero-title">The Unknown Entity</h1>
+    <p class="hero-author">A Story of Ardy</p>
+    <div class="hero-rule"></div>
+  </div>
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- Table of Contents -->
+    <aside class="toc">
+      <span class="toc-label">Contents</span>
+      <ul class="toc-list">
+        <li><a href="#chapter-1" class="active">I — The Shape in the Armchair</a></li>
+        <li><a href="#chapter-2">II — Its True Face</a></li>
+        <li><a href="#chapter-3">III — The Morning After</a></li>
+      </ul>
+    </aside>
+
+    <!-- Reading Column -->
+    <article class="reading-col">
+
+      <!-- Chapter 1 -->
+      <section class="chapter" id="chapter-1">
+        <div class="chapter-header">
+          <span class="chapter-num">Chapter I</span>
+          <h2 class="chapter-title">The Shape in the Armchair</h2>
+          <p class="chapter-epigraph">"There are things that wear the faces of the people you love,<br>and they know this is the cruelest disguise of all."</p>
+        </div>
+        <div class="prose">
+
+          <p>The voice that called from the living room was Viktor's. The cadence was his, the rough timbre worn familiar by years of evenings just like this one — but Ardy paused on the stairs anyway, one hand gripping the rail, ears flat and listening. Something was wrong. Not in any way they could name. Simply wrong, the way a painting can be wrong when the eyes in it track you across a room.</p>
+
+          <p>The hallway below was dark. The television murmured from around the corner, filling the silence with canned laughter and the bluish pulse of its screen. Ardy's mother was not home. She had been coming home later and later these days — the office, she said. The project, the deadline, the long commute. And if those explanations rang a little hollow, Ardy understood. They understood in the way that children who have learned to read silences always understand: she was staying away because home had stopped being safe. Viktor's moods had been souring for months. The bruises on her arms. The careful way she held her wrists. The rehearsed smiles. Ardy had stopped asking questions about any of it.</p>
+
+          <p>They descended the last few steps and turned the corner.</p>
+
+          <p>Viktor sat in the armchair — or the shape that had arranged itself into Viktor's posture sat there, a beer can tilted loosely in one hand. The television threw restless shadows across its face. It did not look up when Ardy entered the room. It simply turned its head, very slowly, and smiled.</p>
+
+          <p class="dialogue">"Come here," it said. "Come sit with me."</p>
+
+          <p>The voice was perfect. That was what made Ardy's skin crawl — not the wrongness of it, but the accuracy. It had mapped Viktor's voice down to the slight rasp at the back of his throat, the way the vowels flattened when he drank. And yet under it, threaded through every syllable, was something else: a resonance too deep, a harmonic that did not belong to any human register.</p>
+
+          <p>Ardy took a step back.</p>
+
+          <p class="dialogue">"You aren't him," they said. It wasn't a question.</p>
+
+          <p>The thing tilted its head at an angle that was a degree or two past natural. The smile did not falter. It lifted the beer can, drank from it in a gesture of impeccable mimicry, and set it down on the armrest.</p>
+
+          <p class="dialogue">"Now what makes you say a thing like that?"</p>
+
+          <p>But the voice had already shifted — the mask slipping, just barely. Under Viktor's cadence, the layered resonance surfaced more clearly now, as though several throats were speaking in near-perfect unison. Ardy pressed their back against the wall, ears pinned, tail rigid.</p>
+
+          <p class="dialogue">"Because Viktor doesn't sound like that," Ardy said. "Not even when he's drunk."</p>
+
+          <p>The thing in the armchair went very still. Then it stood — and the motion was wrong. Not threatening, exactly. Just deeply, irrevocably not-human. Its limbs unfolded with too many joints. Its neck moved like something that had learned to move necks by studying diagrams. For one long moment it simply stood in the television light, wearing Viktor's face over something much older and stranger, and looked at Ardy with eyes that caught the glow and held it a beat too long.</p>
+
+          <p>Then it reached for them.</p>
+
+        </div>
+      </section>
+
+      <!-- Chapter 2 -->
+      <section class="chapter" id="chapter-2">
+        <div class="chapter-header">
+          <span class="chapter-num">Chapter II</span>
+          <h2 class="chapter-title">Its True Face</h2>
+          <p class="chapter-epigraph">"Brave or foolish — the abyss has rarely found reason to distinguish."</p>
+        </div>
+        <div class="prose">
+
+          <p>There was no point in running. Ardy understood this with a clarity that surprised them — some primal arithmetic in the back of the mind, totalling up escape routes and reaching zero. The hand that closed around their wrist was cold, the fingers a few joints too long, the grip firm enough to end the argument before it began. The thing drew them close and looked at them, and for a moment neither of them spoke.</p>
+
+          <p>Ardy met its gaze.</p>
+
+          <p>The eyes were wrong in a way that had nothing to do with colour or shape — they were simply old. Vast. Whatever lived behind them had been watching the world from odd angles for a very long time.</p>
+
+          <p class="dialogue">"What are you planning to do with me?" Ardy asked. Their voice was steadier than they expected.</p>
+
+          <p>The entity turned Ardy's question over, the way one handles an unusual stone found on a beach.</p>
+
+          <p class="dialogue">"Understand you," it said at last, in those layered, resonant tones. "I want to understand what you are."</p>
+
+          <p>Ardy blinked. <em>That's it?</em></p>
+
+          <p class="dialogue">"You could have just asked," they said.</p>
+
+          <p>Something shifted in the creature's expression — not quite surprise, but the shadow of it. Its grip loosened, though it did not let go. The television continued its indifferent murmuring behind them both.</p>
+
+          <p class="dialogue">"Most mortals do not stay calm long enough to be asked," it said.</p>
+
+          <p class="dialogue">"I'm not going anywhere," Ardy said. "I can't, you're still holding my arm. And you haven't done anything terrible. You've been..." They searched for the word. "Polite, actually. For a horror creature."</p>
+
+          <p>The entity released Ardy's wrist.</p>
+
+          <p>A long pause. The shadows in the corners of the room deepened, the television's laugh track filling the space between them. Then, by degrees, the creature began to change. The disguise dissolved — Viktor's image blurring and thinning, the borrowed posture unravelling — and what stood in the living room instead was tall and skeletal and ancient, with luminous eyes that cast faint halos on the ceiling. It was, in every sense, exactly what it was: a thing from somewhere else, wearing its own shape for the first time since it had arrived in this house.</p>
+
+          <p>Ardy looked at it steadily.</p>
+
+          <p class="dialogue">"There," they said. "That's better. Now sit down. You can take the armchair."</p>
+
+          <p>The entity folded its impossible limbs into Viktor's chair with a grace that should have been impossible given its proportions. It watched Ardy settle onto the opposite end of the couch, and for a while it simply studied them — cataloguing, reading, doing whatever it did when it wanted to understand something.</p>
+
+          <p class="dialogue">"You are either very brave," it said at last, "or very foolish."</p>
+
+          <p class="dialogue">"Probably both," Ardy said. "Where do you come from?"</p>
+
+          <p>The question seemed to delight it. A slow movement spread across its features — not quite a smile, but close.</p>
+
+          <p class="dialogue">"A place with no name your language contains," it said. "A realm of shadows and forgotten things, of old powers that predate the words humans use to describe old powers. My kind drift between worlds. Some feed on fear. Some on devotion. Some on grief. I feed on —" a pause, considering — "curiosity. Knowledge. The architecture of minds."</p>
+
+          <p class="dialogue">"And what's knowing me going to give you?" Ardy asked. "How is that useful?"</p>
+
+          <p class="dialogue">"You are unusual," it said simply. "Your nature is not fully mapped. And there is something inside you, dormant, that I have not encountered before. I wanted to see it more clearly." Its luminous gaze was intent, but not unkind. "I mean no harm, Ardy. I want only to look."</p>
+
+          <p>Ardy thought about this for a moment. The television was still on. The room was still dark. Their mother was still not home, and Viktor was somewhere indisposed, and a creature from a nameless realm was sitting in his chair asking, in its way, for permission.</p>
+
+          <p class="dialogue">"Alright," Ardy said. "Go on, then. Look."</p>
+
+          <div class="scene-break">· · ·</div>
+
+          <p>What happened next was difficult to describe in terms of ordinary sensation. The entity did not touch Ardy again — it simply leaned forward, and the room seemed to lean with it, the shadows thickening, the television light dimming to a warm amber blur. There was a pressure at the base of Ardy's skull, gentle and precise, like a hand resting there. A warmth spread outward from their sternum. The creature's eyes, wide and unblinking, held theirs, and in the depths of that gaze Ardy felt themselves seen — not in the way people see you when they want something from you, but in the way a scientist sees something remarkable through a lens: with pure, focused attention.</p>
+
+          <p>Then the room went black.</p>
+
+        </div>
+      </section>
+
+      <!-- Chapter 3 -->
+      <section class="chapter" id="chapter-3">
+        <div class="chapter-header">
+          <span class="chapter-num">Chapter III</span>
+          <h2 class="chapter-title">The Morning After</h2>
+          <p class="chapter-epigraph">"It had been in the house. It had cleaned the kitchen and left a note on the pillow,<br>and somehow that was stranger than all the rest of it."</p>
+        </div>
+        <div class="prose">
+
+          <p>Ardy woke to pale morning light coming through curtains they didn't remember closing.</p>
+
+          <p>For a moment they lay still, listening. The house was very quiet — not the tense, brittle quiet of Viktor's dark moods, but something open and clean, the way a room feels after the windows have been left open all night. Ardy sat up slowly. They were in their own bed, in their own room, with no clear memory of climbing the stairs. The last thing they clearly recalled was the warm amber blur of the television and the creature's eyes holding theirs.</p>
+
+          <p>Something lay on the pillow beside them.</p>
+
+          <p>A single sheet of paper, folded once. They picked it up with careful hands. The paper was heavier than it should have been, the kind of weight that suggested great age, though it appeared perfectly clean. On it, in an elegant script that was unlike any handwriting Ardy had seen before — all long curves and precise angles, like calligraphy designed for a different alphabet and translated letter by letter into English — were two lines:</p>
+
+          <p style="text-align:center; text-indent: 0; font-style:italic; font-size: 1.1em; color: var(--accent); padding: 12px 0;">Until next time, my curious one.<br>Dream of me.</p>
+
+          <p>Below the lines, a signature: a single looping curve, like a question mark, or perhaps like the claw of something that found punctuation charming.</p>
+
+          <p>Ardy stared at the note for a long time. Then they said, to no one in particular, <em>"It can write."</em> The wonder in their voice surprised them.</p>
+
+          <div class="scene-break">· · ·</div>
+
+          <p>Downstairs, the kitchen was spotless.</p>
+
+          <p>Every dish that had piled in the sink over the past week had been washed and stacked. The table was cleared. The broken glass that had lived in a corner since Tuesday — the casualty of one of Viktor's rages — was gone. Even the air smelled different: less stale, less close, with something faintly mineral and cool underneath the usual household scents, like stone after rain.</p>
+
+          <p>Ardy stood in the kitchen doorway for a long moment, just looking.</p>
+
+          <p>Then a sound from the living room — soft, unhurried, the padding of small feet — and a black cat stepped around the corner of the couch and sat down in the middle of the floor. It was sleek and still, with eyes the precise colour of old brass, and it regarded Ardy with the calm patience of something that has no need to rush. Its tail moved in a slow, pendular sweep.</p>
+
+          <p class="dialogue">"Good morning," said the cat, in a voice like several voices speaking in quiet agreement. "I hope you slept well."</p>
+
+          <p>Ardy crouched down and looked at it for a moment. The cat looked back.</p>
+
+          <p class="dialogue">"You cleaned the kitchen," Ardy said.</p>
+
+          <p class="dialogue">"I did," the entity said, through the cat's mouth, entirely without embarrassment. "I cannot abide disorder. One of my few personal preferences."</p>
+
+          <p class="dialogue">"And the note."</p>
+
+          <p class="dialogue">"I thought it polite to explain my departure."</p>
+
+          <p>Ardy sat down on the floor, cross-legged, at eye level with the cat. The morning light came through the cleaned windows in long pale bars. Outside, a bird was singing. The house felt, for the first time in months, like a place where a person might simply breathe.</p>
+
+          <p class="dialogue">"Are you going to keep coming back?" Ardy asked.</p>
+
+          <p>The entity considered this with feline deliberateness — a slow blink, a slight tilt of the head.</p>
+
+          <p class="dialogue">"There is still a great deal I have not understood about you," it said. "So yes. I expect I will."</p>
+
+          <p class="dialogue">"Okay," Ardy said.</p>
+
+          <p>The cat got up, walked forward, and butted its head against Ardy's knee. The touch was cold, as everything about the entity was cold, but not unpleasantly so — more like river water in spring: a different temperature than expected, but clean.</p>
+
+          <p>Ardy put a hand on the cat's back, and the cat sat down and began to purr — a sound like stones settling in deep water — and they stayed like that together in the brightening morning, the strange and the stranger, while the world outside went on without them.</p>
+
+          <div class="chapter-end">✦</div>
+
+        </div>
+      </section>
+
+      <!-- Coming Next -->
+      <div class="coming-next">
+        <span class="coming-label">Coming Next</span>
+        <p class="coming-title">Chapter IV — What Viktor Remembers</p>
+      </div>
+
+    </article>
+  </div>
+
+  <footer>The Shelf &nbsp;·&nbsp; A Private Library</footer>
+
+  <script>
+    // ── Font Size Control ──
+    const prose = document.querySelectorAll('.prose');
+    let size = parseFloat(
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--font-size') || '20'
+    ) || 20;
+    const MIN = 16, MAX = 28, STEP = 1.5;
+
+    function applySize() {
+      prose.forEach(el => el.style.setProperty('--font-size', size + 'px'));
+    }
+
+    document.getElementById('font-up').addEventListener('click', () => {
+      if (size < MAX) { size = Math.min(MAX, size + STEP); applySize(); }
+    });
+    document.getElementById('font-down').addEventListener('click', () => {
+      if (size > MIN) { size = Math.max(MIN, size - STEP); applySize(); }
+    });
+
+    // ── Active TOC Link ──
+    const chapters = document.querySelectorAll('.chapter');
+    const tocLinks = document.querySelectorAll('.toc-list a');
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          tocLinks.forEach(l => l.classList.remove('active'));
+          const link = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+          if (link) link.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+
+    chapters.forEach(ch => observer.observe(ch));
+  </script>
+
+</body>
+</html>

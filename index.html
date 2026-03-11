@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Shelf — Novel Reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #0f0d0b;
+      --paper:    #f5f0e8;
+      --cream:    #ede6d8;
+      --warm:     #c8b99a;
+      --accent:   #5c3d2e;
+      --muted:    #8a7560;
+      --rule:     #d4c8b4;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'EB Garamond', Georgia, serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 60px 48px 40px;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .site-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      font-size: 13px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .site-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    /* ── Main ── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+    }
+
+    .section-label {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    /* ── Novel Card ── */
+    .novel-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .novel-card {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 40px;
+      padding: 48px 0;
+      border-bottom: 1px solid var(--rule);
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .novel-card:first-child { border-top: 1px solid var(--rule); }
+
+    .novel-card:hover .cover-wrap { transform: translateY(-4px); }
+    .novel-card:hover .novel-title { color: var(--accent); }
+
+    /* Cover */
+    .cover-wrap {
+      transition: transform 0.3s ease;
+    }
+
+    .cover {
+      width: 160px;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      border: 1px solid var(--rule);
+    }
+
+    .cover-placeholder {
+      width: 160px;
+      height: 220px;
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover-placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 6px,
+          rgba(255,255,255,0.02) 6px,
+          rgba(255,255,255,0.02) 7px
+        );
+    }
+
+    .cover-placeholder-title {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      padding: 16px;
+      line-height: 1.8;
+    }
+
+    /* Meta */
+    .novel-meta {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .novel-genre {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .novel-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 36px;
+      line-height: 1.1;
+      color: var(--ink);
+      transition: color 0.2s;
+    }
+
+    .novel-author {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .novel-excerpt {
+      font-family: 'EB Garamond', serif;
+      font-size: 17px;
+      line-height: 1.7;
+      color: #4a4035;
+      max-width: 480px;
+      margin-top: 8px;
+    }
+
+    .novel-chapters {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .chapters-count {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--warm);
+    }
+
+    .read-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-top: 20px;
+    }
+
+    .read-cta::after {
+      content: '→';
+      font-family: Georgia, serif;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 40px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--rule);
+      border-top: 1px solid var(--rule);
+    }
+
+    @media (max-width: 680px) {
+      header { padding: 40px 24px 28px; }
+      main { padding: 40px 24px 80px; }
+      .novel-card { grid-template-columns: 120px 1fr; gap: 24px; }
+      .cover-placeholder, .cover { width: 120px; height: 165px; }
+      .novel-title { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span class="site-title">The Shelf</span>
+    <span class="site-tagline">A reader's library</span>
+  </header>
+
+  <main>
+    <p class="section-label">All Novels</p>
+
+    <div class="novel-grid">
+
+      <!-- Novel 1 -->
+      <a class="novel-card" href="novels/the-unknown-entity.html">
+        <div class="cover-wrap">
+          <div class="cover-placeholder">
+            <span class="cover-placeholder-title">The<br/>Unknown<br/>Entity</span>
+          </div>
+        </div>
+        <div class="novel-meta">
+          <span class="novel-genre">Dark Fantasy · Supernatural Horror</span>
+          <h2 class="novel-title">The Unknown Entity</h2>
+          <span class="novel-author">— A Story of Ardy</span>
+          <p class="novel-excerpt">When the thing wearing Viktor's voice called from the darkened living room, Ardy already knew something was wrong. What followed would unravel the boundary between terror and wonder.</p>
+          <div class="novel-chapters">
+            <span class="chapters-count">1 Chapter Available</span>
+          </div>
+          <span class="read-cta">Begin Reading</span>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <footer>The Shelf &nbsp;·&nbsp; A Private Library</footer>
+
+</body>
+</html>
