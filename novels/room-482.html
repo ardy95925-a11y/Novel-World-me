@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Room 482 — The Shelf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    [data-theme="light"] {
+      --bg: #f7f3ed; --surface: #eee8dc; --ink: #1a1612; --prose-ink: #2a2218;
+      --muted: #7a6f62; --rule: #ddd6c8; --accent: #5c3d2e; --tag-bg: #e4ddd0;
+      --nav-bg: rgba(247,243,237,0.94); --hero-bg: #111009; --hero-ink: #e8e0d0;
+    }
+    [data-theme="dark"] {
+      --bg: #0f0e0a; --surface: #1a1813; --ink: #e4ddd0; --prose-ink: #cfc8bb;
+      --muted: #6e6455; --rule: #282318; --accent: #bf8f55; --tag-bg: #201e18;
+      --nav-bg: rgba(15,14,10,0.94); --hero-bg: #080705; --hero-ink: #e8e0d0;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--ink); font-family: 'EB Garamond', Georgia, serif; -webkit-font-smoothing: antialiased; transition: background 0.3s, color 0.3s; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; transition: background 0.3s, border-color 0.3s; }
+    .nav-back { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 7px; transition: color 0.15s; }
+    .nav-back::before { content: '←'; font-family: Georgia, serif; font-size: 13px; letter-spacing: 0; }
+    .nav-back:hover { color: var(--accent); }
+    .nav-center { position: absolute; left: 50%; transform: translateX(-50%); font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); white-space: nowrap; pointer-events: none; }
+    .nav-right { display: flex; align-items: center; gap: 4px; }
+    .icon-btn { width: 34px; height: 34px; border: none; background: none; border-radius: 7px; cursor: pointer; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: background 0.15s, color 0.15s; }
+    .icon-btn:hover { background: var(--surface); color: var(--ink); }
+    .icon-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+    .reading-bar { position: fixed; top: 52px; left: 0; right: 0; z-index: 99; height: 2px; }
+    .reading-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.1s linear; }
+    .overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .settings-drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 201; width: 280px; background: var(--bg); border-left: 1px solid var(--rule); transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), background 0.3s, border-color 0.3s; }
+    .settings-drawer.open { transform: translateX(0); }
+    .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--rule); }
+    .drawer-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+    .drawer-body { padding: 28px 20px; display: flex; flex-direction: column; gap: 28px; }
+    .setting-row > .s-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 14px; }
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .theme-opt { border: 1px solid var(--rule); border-radius: 8px; padding: 12px 10px 10px; cursor: pointer; background: var(--surface); display: flex; flex-direction: column; gap: 8px; transition: border-color 0.15s; }
+    .theme-opt:hover { border-color: var(--muted); }
+    .theme-opt.active { border-color: var(--accent); }
+    .swatch { width: 100%; height: 30px; border-radius: 4px; border: 1px solid var(--rule); }
+    .swatch.light { background: #f7f3ed; } .swatch.dark { background: #0f0e0a; }
+    .theme-opt span { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-align: center; }
+    .font-row { display: flex; gap: 8px; }
+    .font-sz-btn { flex: 1; border: 1px solid var(--rule); background: var(--surface); border-radius: 7px; padding: 10px; cursor: pointer; font-family: 'EB Garamond', serif; color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 15px; transition: border-color 0.15s, background 0.15s; }
+    .font-sz-btn:hover { border-color: var(--accent); background: var(--tag-bg); }
+    .hero { background: var(--hero-bg); padding: 100px 28px 64px; text-align: center; position: relative; overflow: hidden; transition: background 0.3s; }
+    .hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,185,154,0.2), transparent); }
+    .hero-eye { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(200,185,154,0.5); margin-bottom: 18px; display: block; }
+    .hero-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(36px, 6vw, 60px); line-height: 1.06; color: var(--hero-ink); margin-bottom: 12px; }
+    .hero-sub { font-family: 'EB Garamond', serif; font-style: italic; font-size: 17px; color: rgba(200,185,154,0.5); }
+    .layout { display: grid; grid-template-columns: 200px 1fr; max-width: 1000px; margin: 0 auto; padding: 0 28px; gap: 64px; align-items: start; }
+    .toc { position: sticky; top: 72px; padding: 48px 0; }
+    .toc-lbl { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 20px; }
+    .toc ul { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+    .toc a { font-family: 'EB Garamond', serif; font-size: 14.5px; color: var(--muted); text-decoration: none; padding: 7px 10px; display: block; border-left: 1px solid transparent; transition: color 0.2s, border-color 0.2s; line-height: 1.4; }
+    .toc a:hover, .toc a.active { color: var(--accent); border-left-color: var(--accent); }
+    .reading { padding: 56px 0 100px; }
+    .chapter { margin-bottom: 72px; }
+    .ch-head { margin-bottom: 40px; padding-bottom: 28px; border-bottom: 1px solid var(--rule); }
+    .ch-num { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 10px; }
+    .ch-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 34px; line-height: 1.12; color: var(--ink); }
+    .ch-epigraph { margin-top: 18px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 17px; color: var(--muted); padding-left: 20px; border-left: 2px solid var(--rule); line-height: 1.6; }
+    .prose { --fs: 20px; font-family: 'EB Garamond', Georgia, serif; font-size: var(--fs); line-height: 1.86; color: var(--prose-ink); }
+    .prose p { margin-bottom: 1.45em; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    .prose p + p { text-indent: 1.4em; }
+    .prose p:first-of-type { text-indent: 0; }
+    .prose p:first-of-type::first-letter { font-family: 'Cormorant Garamond', serif; font-size: 4.4em; font-weight: 300; line-height: 0.8; float: left; margin-right: 0.08em; margin-top: 0.06em; color: var(--accent); }
+    .prose em { font-style: italic; }
+    .scene-break { text-align: center; color: var(--muted); letter-spacing: 0.5em; font-size: 13px; margin: 2.2em 0; user-select: none; }
+    .ch-end { text-align: center; color: var(--muted); font-family: 'Cormorant Garamond', serif; font-size: 18px; margin-top: 48px; opacity: 0.5; }
+    footer { text-align: center; padding: 28px; font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--rule); border-top: 1px solid var(--rule); }
+    @media (max-width: 720px) { nav { padding: 0 18px; } .nav-center { display: none; } .hero { padding: 88px 20px 52px; } .layout { grid-template-columns: 1fr; padding: 0 18px; gap: 0; } .toc { display: none; } .reading { padding: 36px 0 72px; } .settings-drawer { width: 100%; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="../index.html">Library</a>
+  <span class="nav-center">Room 482</span>
+  <div class="nav-right">
+    <button class="icon-btn" id="settings-btn" aria-label="Settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="reading-bar"><div class="reading-bar-fill" id="reading-bar-fill"></div></div>
+<div class="overlay" id="overlay"></div>
+
+<div class="settings-drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="drawer-label">Settings</span>
+    <button class="icon-btn" id="drawer-close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="setting-row">
+      <span class="s-label">Theme</span>
+      <div class="theme-grid">
+        <div class="theme-opt active" data-t="light"><div class="swatch light"></div><span>Light</span></div>
+        <div class="theme-opt" data-t="dark"><div class="swatch dark"></div><span>Dark</span></div>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="s-label">Text Size</span>
+      <div class="font-row">
+        <button class="font-sz-btn" id="font-down">A−</button>
+        <button class="font-sz-btn" id="font-up">A+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <span class="hero-eye">Slice of Life · Found Family</span>
+  <h1 class="hero-title">Room 482</h1>
+  <p class="hero-sub">A Story of Beanito and Lune</p>
+</div>
+
+<div class="layout">
+  <aside class="toc">
+    <span class="toc-lbl">Contents</span>
+    <ul>
+      <li><a href="#ch1" class="active">I — The Stairs</a></li>
+      <li><a href="#ch2">II — The Apartment</a></li>
+      <li><a href="#ch3">III — Hot Chocolate</a></li>
+      <li><a href="#ch4">IV — Lune</a></li>
+      <li><a href="#ch5">V — Anime Night</a></li>
+      <li><a href="#ch6">VI — Carried</a></li>
+      <li><a href="#ch7">VII — Soft Fur, Good Heart</a></li>
+      <li><a href="#ch8">VIII — The Long Week</a></li>
+      <li><a href="#ch9">IX — Stay</a></li>
+    </ul>
+  </aside>
+
+  <article class="reading">
+
+    <!-- ── Chapter I ── -->
+    <section class="chapter" id="ch1">
+      <div class="ch-head">
+        <span class="ch-num">Chapter I</span>
+        <h2 class="ch-title">The Stairs</h2>
+        <p class="ch-epigraph">"Every threshold looks the same from the wrong side of it —<br>just a door, just a number, just somewhere you didn't choose."</p>
+      </div>
+      <div class="prose">
+        <p>The building smelled like old carpet and radiator heat, the particular scent of a place that had been sheltering people without fanfare for a very long time. Beanito stood at the bottom of the stairs with a duffel bag slung over one shoulder and a cardboard box balanced in both arms, and he looked up at the four flights ahead of him with the expression of a creature who had already used up the last of his patience somewhere around the third bus stop.</p>
+        <p>It had been a long day. Longer than that, really — a long month, a long season, the kind of sustained difficulty that settles into your joints and makes every subsequent inconvenience feel like a personal insult. The landlord had been decent about it, all things considered; there had been no shouting, only a quiet and intractable finality to the conversation, the bills laid out on the kitchen table like evidence at a trial. Beanito had not argued. He had simply gathered what he could carry and left before his pride had time to fully understand what was happening.</p>
+        <p>He climbed.</p>
+        <p>His small frame was deceptive — he was stronger than he looked, all compact muscle under the oversized green hoodie, but the bag was heavy and his feet hurt and the stairs went on for much longer than any reasonable staircase had a right to. By the second landing, his tail had gone flat against his back. By the third, he was breathing through his nose in the slow, controlled way that meant he was irritated and doing something about it. His big black eyes, usually sharp with observation, had gone narrow and inward, cataloguing grievances in the privacy of his own head.</p>
+        <p>Room 482 was at the end of a corridor that bent slightly left, as though the building itself had grown tired and leaned. The number was mounted in brass that had gone greenish at the corners. Beanito set the box down on the floor, rolled his shoulders, and looked at the door for a moment.</p>
+        <p>He had no particular feelings about it. He was, at that moment, a creature operating on pure function — get inside, put things down, stop moving. The idea of a roommate was somewhere in the back of his mind, a nuisance he had agreed to because the alternative was worse, but he hadn't had the energy to think about what that would actually mean in practice. A stranger in the same space. Someone else's habits and noise and presence. He would manage. He always managed.</p>
+        <p>He knocked three times.</p>
+        <p>The pause on the other side was short — barely a breath. Then footsteps, light and quick, and the door opened.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter II ── -->
+    <section class="chapter" id="ch2">
+      <div class="ch-head">
+        <span class="ch-num">Chapter II</span>
+        <h2 class="ch-title">The Apartment</h2>
+        <p class="ch-epigraph">"Generosity offered without expectation<br>is the most disorienting gift there is."</p>
+      </div>
+      <div class="prose">
+        <p>The apartment was not what Beanito had been expecting.</p>
+        <p>He had braced himself for something provisional — the kind of place that communicated its own temporariness in every surface, where the furniture had been bought from convenience rather than preference and the walls were that particular shade of off-white that said nobody had bothered to imagine anything different. He had been prepared for thin walls and a kitchen that smelled of other people's cooking and a bathroom where things did not quite drain at the right speed.</p>
+        <p>What he walked into instead was clean and warm and, in the particular way of spaces that have been arranged by someone who actually paid attention, quietly beautiful. The floors were light wood. The windows were large. There were plants on the sill — small ones, in terracotta pots — and the kind of soft overhead lighting that made the whole space feel settled rather than exposed. It was modern without being cold. It was, if he was being honest with himself, nicer than anywhere he had lived in the last three years.</p>
+        <p>He stepped inside and set the box down, his ears slowly lifting from their flattened position as he took stock of the room. His eyes moved over everything in quick, assessing passes — the furniture, the layout, the exits, out of habit — and then arrived at the person standing by the open door.</p>
+        <p>Lune. That was the name from the listing, from the brief and largely logistical exchange that had led Beanito to this doorway. In person, Lune was slight and calm, with a quiet, unhurried quality about them — the kind of person for whom the present moment was generally sufficient. They were watching Beanito with an expression that was open and patient and entirely free of the particular social performance that most people felt compelled to produce when meeting a stranger for the first time.</p>
+        <p>"Come in," Lune said. "Take whichever room you want. Both are empty. I've got no preference."</p>
+        <p>Beanito looked at them for a long moment, waiting for the catch. It didn't come. Lune simply stood there with the easy posture of someone who had just made an offer they fully intended to keep, and waited.</p>
+        <p>"Alright," Beanito said at last, and went to look.</p>
+        <p>Both rooms were decent. The one on the left had a slightly larger bed and a window that faced the street rather than the interior courtyard — he could hear the city from it, that low wash of sound that was nothing specific and somehow everything, the ambient proof of a world continuing to operate outside his immediate difficulties. He chose it the way he made most decisions: quickly, and without second-guessing.</p>
+        <p>He was halfway through unpacking when Lune's voice came from the doorway again, quiet and unhurried. "Fridge is full, by the way. Help yourself to anything. And — I won't charge you rent. Not while you're getting back on your feet."</p>
+        <p>Beanito stopped. He had a shirt in each hand and he stood very still for a moment, processing. "Why?" he said. The word came out shorter than intended.</p>
+        <p>Lune didn't flinch from it. "Because I can," they said, as though generosity were simply a practical matter of having the means and choosing the use. "And because you looked tired when you knocked."</p>
+        <p>He had no response to that. He set the shirts down on the bed and looked at the window for a moment, and then Lune pressed a roll of cash into his hands — a head start, they said, no strings — and stepped back before he could finish the argument forming in his throat.</p>
+        <p>He stared at the money. Then at Lune. Then at the money again. He shoved it into his hoodie pocket, because leaving it on the dresser felt worse than taking it.</p>
+        <p>"You're strange," he said. It came out almost like a compliment.</p>
+        <p>Lune smiled — a small, real thing. "I'll let you settle in," they said, and left him to it, pulling the door closed behind them without ceremony, as though giving a person room to breathe were the most ordinary thing in the world.</p>
+        <p>Beanito stood alone in his new room and listened to the apartment, the way he listened to all unfamiliar spaces, feeling for its particular character. The building creaked once, gently. The city murmured outside. Everything was very still.</p>
+        <p>He went back to unpacking.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter III ── -->
+    <section class="chapter" id="ch3">
+      <div class="ch-head">
+        <span class="ch-num">Chapter III</span>
+        <h2 class="ch-title">Hot Chocolate</h2>
+        <p class="ch-epigraph">"Hunger, in the end, is more honest<br>than any of the things we use to cover it."</p>
+      </div>
+      <div class="prose">
+        <p>He told himself he needed to be alone, and he did — that much was true. Beanito had spent years building a particular kind of equilibrium that depended on space, on the reliable absence of expectation, on being the only person whose moods he had to manage. He needed to unpack, to arrange his few possessions into some configuration that felt like a foothold, to lie on the new bed and let the ceiling be ordinary above him.</p>
+        <p>He managed about forty minutes of this before the smell reached him.</p>
+        <p>It was coming from the kitchen — something warm and sweet and specific, the kind of scent that functions less as a sensory experience and more as a direct communication to some older, less guarded part of the brain. He lay on his back staring at the ceiling and tried to ignore it. His stomach, having no patience for dignity, offered its own contribution to the conversation.</p>
+        <p>He had eaten a granola bar on the second bus. That was all he'd had since breakfast.</p>
+        <p>He got up. He padded down the hallway in his socks and stopped just before the kitchen doorway, leaning around the corner with the studied nonchalance of someone pretending not to be doing exactly what they were doing. Lune was at the stove with their back to him, stirring something in a small pot, the overhead light warm on their hair. The apartment was quiet except for the low sound of the city outside and the soft scrape of the spoon against the pot.</p>
+        <p>"Hey," Beanito said. His voice came out slightly less gruff than intended.</p>
+        <p>Lune turned, unsurprised, as though they had already heard him in the hallway. "Hey. Making hot chocolate. Want some?"</p>
+        <p>He made a show of considering this. He hopped up onto one of the stools at the kitchen counter — they were the right height for him, a detail that pleased him more than he'd have admitted — and settled his elbows on the surface. "If there's enough," he said, which was not a yes but functioned as one.</p>
+        <p>"There's enough," Lune said. "You eaten today?"</p>
+        <p>A pause. "More or less."</p>
+        <p>Lune set a second pot on the burner without comment. The absence of comment was, Beanito was beginning to understand, something of a signature — Lune seemed constitutionally uninterested in making other people feel observed or judged. They simply responded to what was actually true and adjusted accordingly, the way a person does when they've decided to be useful rather than impressive.</p>
+        <p>He watched them from his perch on the stool. Lune moved through the kitchen with the comfortable economy of someone who spent genuine time there — not performing, not narrating, just doing. A proper meal took shape from the fridge and the pantry: something warm and filling, assembled with enough care to be good without being fussy. Something that would reach a person who was cold and hadn't eaten properly and wouldn't say so directly.</p>
+        <p>When the food was done, Lune slid it across the counter, caught Beanito's eyes for just a moment, and said: "I'll be in my room. Don't stress about the dishes."</p>
+        <p>And they left. Just like that. They didn't hover, didn't watch him eat, didn't wait for gratitude in any particular form. The kitchen was quiet and warm and the food was in front of him and the hot chocolate was steaming gently beside the bowl.</p>
+        <p>Beanito ate alone and was, for the first time in a very long time, genuinely comfortable.</p>
+        <div class="scene-break">· · ·</div>
+        <p>Later, when the bowl was empty and the mug was nearly so, he sat with both hands wrapped around the warm ceramic and thought about what he was doing here. Not in the apartment — he understood that, the logistics of it, the necessity. He meant here in this specific kitchen, with this particular person elsewhere, having just accepted food and money and a bed from someone who had asked for nothing in return.</p>
+        <p>He was not good at this. He had never been especially good at receiving things. His life had taught him to be suspicious of generosity, which was a reasonable lesson drawn from reasonable evidence, and it had served him adequately. But sitting in Lune's kitchen with his stomach full and the hot chocolate going cool in his hands, he had the unsettled sense of a person who has been carrying a weight so long they have forgotten it is there, and has only just now, without planning to, set it down.</p>
+        <p>He washed his own dishes. He put the mug back on its hook. He went to his room.</p>
+        <p>He lay on the new bed and looked at the ceiling, and the city hummed outside the window, and he was asleep before he had finished deciding whether or not he was tired.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter IV ── -->
+    <section class="chapter" id="ch4">
+      <div class="ch-head">
+        <span class="ch-num">Chapter IV</span>
+        <h2 class="ch-title">Lune</h2>
+        <p class="ch-epigraph">"How a person inhabits themselves<br>is its own kind of answer to every question you might ask about them."</p>
+      </div>
+      <div class="prose">
+        <p>He knocked on Lune's door that night without fully deciding to.</p>
+        <p>It was late. The apartment had been quiet for a few hours — the kind of quiet that accumulates when two people are being careful not to impose on each other, a thoughtful silence that was also, if you paid attention, a little lonely. Beanito had been lying in his room reading on his phone, not reading, staring at the ceiling, reading again. The restlessness had nothing specific to blame itself on. He had simply discovered that being alone in an unfamiliar place was different from being alone in a familiar one — that the unfamiliarity had a texture to it, something that made the quiet feel less like rest and more like waiting.</p>
+        <p>He knocked, softly, three times.</p>
+        <p>There was a brief sound from inside — movement — and then the door opened, and Lune stood in the light from the room behind them, and Beanito's brain performed a rapid and visible recalibration.</p>
+        <p>Lune was wearing a skirt. A soft, dark one, mid-thigh, with patterned thigh-highs and an oversized knit top that had slipped off one shoulder. It was an outfit that had been assembled with obvious attention — not for any particular audience, not performatively, but in the way that clothes can be when they've been chosen by someone who knows what makes them feel like themselves. Lune looked comfortable. Lune looked, in some way that Beanito couldn't immediately articulate, completely and unself-consciously <em>right.</em></p>
+        <p>Beanito stared. His ears went back. His tail, against his better judgment, puffed slightly at the base.</p>
+        <p>"I," he said.</p>
+        <p>Lune looked at him, then at themselves, then back at him with an expression of mild and unsurprised recognition. "Oh. Right. I forgot to mention."</p>
+        <p>"You're—"</p>
+        <p>"A femboy," Lune said. Easily, matter-of-factly, the way you'd say <em>left-handed</em> or <em>vegetarian.</em> "Wasn't hiding it, just didn't think to lead with it. Does it bother you?"</p>
+        <p>Beanito's gaze had gone somewhere carefully to the left of Lune's shoulder — a compromise between looking and not looking that he was maintaining with some effort. "I'm not—" he started. "I mean. No. I just wasn't—"</p>
+        <p>"That's fair," Lune said. "If you'd rather I dressed differently around the apartment I genuinely don't mind—"</p>
+        <p>"Don't," Beanito said, faster than he meant to. Lune's eyebrows rose slightly. He cleared his throat. "Don't change anything on my account. It's your place. Wear what you want." He folded his arms across his chest, the universal gesture of a creature trying to look more composed than it currently was. "I'm straight, by the way. Just — putting that out there."</p>
+        <p>Lune blinked, then smiled — a genuine one that reached their eyes and stayed there. "So am I," they said. "Femboy's not an orientation. It's just — a way of being. The clothes feel right. There's a community around it. I'm not performing anything." A slight pause, and then, simply: "It makes me feel like myself."</p>
+        <p>Beanito thought about this. He uncrossed and recrossed his arms. "Like a style thing," he said.</p>
+        <p>"Exactly like that."</p>
+        <p>Something loosened in his chest — the tension of an unfamiliar thing becoming less unfamiliar, the incremental process by which the world adjusts itself back to comprehensible. He had managed worse adjustments than this. This was, he was realising, simply a person who knew what they liked and wore it without apology, which was something he had always respected in principle and found, on reflection, that he respected in practice too.</p>
+        <p>"You said you wanted to talk," Lune said. "About the living situation."</p>
+        <p>He'd said no such thing, but he'd knocked on the door, which amounted to the same thing. "Yeah," he said. "Okay."</p>
+        <p>Lune stepped aside to let him in.</p>
+        <div class="scene-break">· · ·</div>
+        <p>They talked about the practical things. Who did which grocery run. Whether noise at night was an issue (it was, for Beanito, before eleven; not at all, for Lune). The bathroom. The question of guests, which Beanito raised with the bluntness of someone who had been burned by this before, and which Lune handled with characteristic directness: ask first, always, no exceptions. They shook on it.</p>
+        <p>Beanito was halfway to the door when Lune said, "You could stay, if you want. I was going to put something on."</p>
+        <p>The offer was given in the same neutral, unhurried tone as everything else Lune said. Genuinely optional. Genuinely without pressure. Beanito turned back, and said, "What are you watching?"</p>
+        <p>And that was how the night continued.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter V ── -->
+    <section class="chapter" id="ch5">
+      <div class="ch-head">
+        <span class="ch-num">Chapter V</span>
+        <h2 class="ch-title">Anime Night</h2>
+        <p class="ch-epigraph">"You can learn a great deal about a person<br>by watching how they watch something they love."</p>
+      </div>
+      <div class="prose">
+        <p>The show was good. He didn't say so, but Lune probably knew — his tail gave him away, the slight curl of it that he had never quite managed to govern when something engaged him. He laughed twice without meaning to, short and involuntary, the kind of laugh that escapes before your face has finished deciding whether to allow it. Lune laughed too, differently — easier, more freely, without any apparent self-consciousness — and didn't make anything of the fact that Beanito was laughing, which was the correct thing to do.</p>
+        <p>Lune had been rationing the series, they confessed — three episodes behind because they weren't ready to be done with it. Beanito understood this, the instinct to slow-walk toward the end of something worth loving. He had done it with books when he was younger, reading the last chapters in small doses, delaying the finality of the last page. He didn't say this. But the knowledge of it made him feel, in some minor and private way, that he and Lune were people who understood the same thing about the world.</p>
+        <p>By the third episode the space between them on the couch had closed somewhat, not through any deliberate movement but through the natural drift that happens when two people stop performing their own separateness. Beanito's shoulder was a few inches from Lune's. He was aware of this in a remote, background-processing kind of way — present, noted, not requiring a response.</p>
+        <p>He was not sure when, exactly, Lune fell asleep.</p>
+        <p>He noticed it the way you notice a change in light — gradually, then all at once. The breathing beside him had slowed and deepened. The small movements had stopped. And then, with the quiet inevitability of something that had been happening longer than he'd registered, the weight against his shoulder was Lune, tipped sideways in sleep, their head come to rest just below his collarbone.</p>
+        <p>Beanito went very still.</p>
+        <p>He looked down at Lune's sleeping face. The animation of it was gone — just the face itself, unguarded, younger-looking, with the long and peaceful exhalations of someone fully, trustingly asleep. It occurred to him that falling asleep against someone required a particular kind of unconscious trust — the kind that had nothing to do with decisions and everything to do with the body's own quiet accounting of where it felt safe. The thought moved through him without quite becoming a feeling he could name.</p>
+        <p>He reached up, very slowly, and put his arm around their shoulders. He told himself it was just to make sure they didn't slip. He was, in the privacy of his own head, a somewhat unreliable narrator.</p>
+        <p>On screen, the episode continued without them. The city murmured outside the window. The lamp in the corner cast its warm, unhurried light across the room, and Beanito sat with his arm around a sleeping stranger and felt something he hadn't felt in a very long time — not happiness exactly, but the quieter thing that sometimes precedes it, the sense of a world that was, at this particular moment, asking nothing of him at all.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VI ── -->
+    <section class="chapter" id="ch6">
+      <div class="ch-head">
+        <span class="ch-num">Chapter VI</span>
+        <h2 class="ch-title">Carried</h2>
+        <p class="ch-epigraph">"Tenderness is often loudest<br>when it says nothing at all."</p>
+      </div>
+      <div class="prose">
+        <p>He must have dozed off himself at some point — the credits were rolling when he blinked back to full awareness, a music-box theme playing softly over the end card. The lamp in the corner was still on. The apartment was entirely quiet.</p>
+        <p>Lune was still asleep against him, breathing slow and even.</p>
+        <p>Beanito sat for a moment in the late-night hush and ran a private accounting of the situation. He was not, as a general rule, someone who held people while they slept. He was not someone who let himself be held. He had constructed his solitude deliberately and maintained it carefully, and he had very good reasons for all of it — reasons that had served him well, reasons he had not yet found cause to question. And yet here he was, in an apartment he'd moved into eleven hours ago, with a near-stranger asleep against his shoulder, and the only honest thing he could report about the experience was that it had been deeply, uncomplicatedly comfortable.</p>
+        <p>He sat with this for a moment. Then he looked at Lune, and made a decision.</p>
+        <p>He was bigger than he looked — not by much, but enough. He gathered Lune carefully, with the particular care of someone who has decided a thing is worth doing properly, and stood. Lune stirred slightly, made a small, drowsy sound, and was asleep again before Beanito had fully straightened. He navigated to the bedroom by memory and lamplight, doing the geometry of the doorframe, the corner, the bedside.</p>
+        <p>He laid Lune down. He pulled the covers up. He stood for a moment in the dim room, looking at the sleeping shape of his new roommate — the person who had opened the door without suspicion, who had offered two free rooms, who had cooked food and asked nothing in return, who had fallen asleep against a stranger's shoulder with the easy trust of someone who had not yet learned to ration it.</p>
+        <p>He should have left then. He had been about to. But he lingered one moment too long, and in that moment, on some quiet impulse he would have been entirely unable to explain if asked, he leaned down and pressed a brief and feather-light kiss to Lune's forehead — something close to gratitude, something close to apology for every gruff response of the day, something he immediately told himself had not happened.</p>
+        <p>He closed the door behind him with a soft click and stood in the hallway for a moment in the dark.</p>
+        <p>In his own room, he lay on his back and stared at the ceiling and felt the strange, weightless vertigo of a day that had gone somewhere entirely other than expected. He had come here looking for a place to survive. He had not been planning to find anything else.</p>
+        <p>He was asleep within minutes. The apartment held them both in its warm, undemanding quiet.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VII ── -->
+    <section class="chapter" id="ch7">
+      <div class="ch-head">
+        <span class="ch-num">Chapter VII</span>
+        <h2 class="ch-title">Soft Fur, Good Heart</h2>
+        <p class="ch-epigraph">"To be seen clearly, without flinching,<br>by someone who has no reason to pretend — that is a rare thing."</p>
+      </div>
+      <div class="prose">
+        <p>In the morning there was coffee. Beanito made it on instinct, the muscle memory of years of solo mornings, and then stood at the counter realising he had made enough for two. He stared at the second mug as though it had appeared without his involvement, which was not entirely untrue.</p>
+        <p>Lune appeared in the kitchen doorway looking sleep-soft and unhurried, still in the clothes from the night before, hair doing something that defied description. They stopped when they saw the counter. "You made coffee."</p>
+        <p>"There's enough," Beanito said, which had worked out reasonably well as an answer the last time.</p>
+        <p>Lune poured themselves a cup and leaned against the opposite counter. "Thank you," they said. "For last night. I woke up in my room and I know I fell asleep on the couch, so—" A pause. "You didn't have to do that."</p>
+        <p>Beanito's ears dipped slightly. He was looking at the far wall. "You would've had a bad neck in the morning," he said. "Practical."</p>
+        <p>"Sure," Lune said, not pressing it, which was the correct response.</p>
+        <p>They drank their coffee in a comfortable quiet. It was the kind of quiet that had already started, overnight, to feel like a known thing — specific to this kitchen, this light, these two people.</p>
+        <p>Then Lune said, "Can I say something that might be a little strange?"</p>
+        <p>Beanito glanced sideways. "Probably."</p>
+        <p>"Your fur," Lune said. "When I was falling asleep, I remember thinking — it's really soft. It was genuinely comforting." They said it plainly, without the self-conscious hedging that people sometimes used to make honest observations feel smaller and safer than they were. "I don't entirely know why I'm telling you this. I just — it was nice."</p>
+        <p>Beanito looked at his coffee mug. The blush under his dark fur was not visible, but the slow movement of his ears — rotating back, then settling — was an adequate substitute. He cleared his throat. "My mother used to say the same thing," he said. "When I was little." He heard himself and added, quickly: "Not that you're — I'm not comparing you to—"</p>
+        <p>"It's a compliment," Lune said. "You can just take it."</p>
+        <p>A pause. Then, quietly: "Okay."</p>
+        <p>Lune crossed the kitchen and put their arms around him. Uncomplicated. Direct. The hug lasted exactly long enough to be real — not a performance, not a gesture, just a person saying something they didn't want to say with words. "You have a good heart too," they said, into his shoulder. "I can already tell."</p>
+        <p>Beanito did not move for a moment. He stood very still in the middle of Lune's kitchen on his second morning there, with his coffee cooling on the counter, and held the moment carefully — the way you hold things that you're afraid of dropping.</p>
+        <p>Then, slowly, he raised one arm and settled it across Lune's back, and held on.</p>
+        <p>"You don't know me," he said, eventually. His voice was low and slightly careful, the voice of someone saying a true thing and watching to see what the other person does with it.</p>
+        <p>"Not yet," Lune said. "But I've got time."</p>
+        <p>The coffee went cold. Neither of them commented on this. Outside the kitchen window, the city went about its morning with admirable indifference to any of it, and the plants on the sill turned their faces slowly toward the light, and something shifted, in room 482, that didn't shift back.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VIII ── -->
+    <section class="chapter" id="ch8">
+      <div class="ch-head">
+        <span class="ch-num">Chapter VIII</span>
+        <h2 class="ch-title">The Long Week</h2>
+        <p class="ch-epigraph">"Home is the word we use when we mean:<br>the place where I stopped having to explain myself."</p>
+      </div>
+      <div class="prose">
+        <p>A week passed, and then another, and the apartment quietly became a place where two lives overlapped.</p>
+        <p>Beanito learned the rhythms of it by accumulation — the way Lune moved through mornings slowly and evenings quickly, the tea before bed that was non-negotiable, the music from the other room that was never quite loud enough to be an imposition and always just present enough to make the space feel inhabited. He learned which drawer had the good spoons and which plant needed water every three days and exactly how far the kitchen window had to be open before the draft made his ears go cold. He learned these things the way you learn a language by living in it — without noticing the acquisition until you realise, one evening, that you are thinking in it.</p>
+        <p>Lune learned him too. They learned that he needed roughly forty-five minutes of silence after waking before he was ready to be spoken at, and they gave it without negotiation. They learned that he would not ask for things but would accept them if they were offered as obvious and unremarkable, and so they offered things in that register — casually, without ceremony. They noticed when he came home with a particular set to his shoulders, the compressed posture of a creature who had been holding something in all day, and they did not ask about it, but they made sure there was food and space and, on two occasions, put on the anime again without asking if he wanted to watch, just started it and waited.</p>
+        <p>He watched. Obviously.</p>
+        <div class="scene-break">· · ·</div>
+        <p>On a Thursday in the second week, Beanito came home in the rain. He had been out most of the day — job listings, a coffee shop with wifi, the particular grinding low-grade indignity of sending applications into silence. He was wet and cold and had the specific kind of tired that isn't physical, that lives in the part of you that has to keep believing the effort is worth it.</p>
+        <p>He stood in the hallway dripping on the mat and didn't immediately move.</p>
+        <p>Lune appeared from the kitchen, took one look at him, and said nothing. They went back into the kitchen. The sound of something being put on the stove followed. Beanito hung up his jacket and his bag and padded through in his damp socks and sat on the stool at the counter, and Lune set a bowl in front of him — soup, something with real warmth and depth to it — and then sat on the other stool with their own bowl and didn't require anything from him.</p>
+        <p>They sat and ate and the rain came down outside the kitchen window and the lamp over the counter made a warm island of the two of them in the grey afternoon.</p>
+        <p>"I'm going to be okay," Beanito said eventually. He meant it as a statement. It came out somewhere closer to a question.</p>
+        <p>"Yes," Lune said. Simply, without qualification, as though it were not a matter of opinion.</p>
+        <p>He looked at them sidelong. "You sound very sure about that."</p>
+        <p>"You climbed four flights of stairs carrying a box and knocked on a stranger's door," Lune said. "That's the kind of person who figures things out."</p>
+        <p>Beanito was quiet for a moment, looking at his soup. Something settled in him — not resolved, not fixed, but quieter than before, the way a room settles after the draft has stopped. "I don't usually let people—" he started, and then stopped, not sure where the sentence was going.</p>
+        <p>"I know," Lune said.</p>
+        <p>"I'm working on it."</p>
+        <p>"I know that too."</p>
+        <p>The rain continued. Beanito ate his soup. His tail, without his involvement, curved a slow and contented arc and came to rest lightly against Lune's knee — the most unconscious gesture he had made in years, the kind that bypasses decision entirely and simply happens, and which he did not take back.</p>
+        <p>Lune did not comment on this.</p>
+        <p>This, Beanito was beginning to understand, was one of the very best things about them.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter IX ── -->
+    <section class="chapter" id="ch9">
+      <div class="ch-head">
+        <span class="ch-num">Chapter IX</span>
+        <h2 class="ch-title">Stay</h2>
+        <p class="ch-epigraph">"The bravest thing is sometimes just<br>staying in the room."</p>
+      </div>
+      <div class="prose">
+        <p>It was a Saturday morning three weeks in when Beanito stood in the kitchen making toast and realised he had, without planning to, started to feel at home.</p>
+        <p>Not at home in the way of a familiar place — he had felt that before, in worse places, and it had not kept him safe. He meant at home in the deeper sense, the one that had less to do with walls and more to do with the quality of being allowed to be exactly where and who you were, without performance, without the ongoing low-grade work of managing how you came across. He meant the kind of at home that was, at its root, about another person.</p>
+        <p>Lune came into the kitchen in the soft morning light, yawning, reaching past him for the kettle with the easy habit of shared space, their shoulder brushing his. They were in sleep clothes and an oversized cardigan and their hair was doing something that defied all structural expectation, and they did not seem to notice or care. This was one of the things Beanito had quietly come to admire about them — the absence of the low-level performance that most people maintained even at home, the willingness to simply be unfinished.</p>
+        <p>"Morning," Lune said.</p>
+        <p>"Morning," Beanito said.</p>
+        <p>They made tea. He finished the toast. They stood at the counter and looked out the window at the city waking up, unhurried, saying nothing in particular, and the quiet between them was the good kind — the kind that does not need filling.</p>
+        <div class="scene-break">· · ·</div>
+        <p>Later, on the couch, Beanito was reading — or trying to; the same paragraph for the fourth time — when Lune settled beside him and said, with their characteristic directness: "Can I ask you something?"</p>
+        <p>"You're going to anyway," he said.</p>
+        <p>A small smile. "Are you doing okay? Not fine-okay. Actually okay."</p>
+        <p>He put his phone down. He looked at Lune, and for a moment said nothing, running the interior calculation that was, for him, the precursor to honesty — the accounting of what it would cost, the weighing of the risk. He had been running that calculation more often lately, and arriving, each time, at the same answer: in this room, with this person, the cost was manageable.</p>
+        <p>"Better," he said. "Actually better." A pause. "It's — you make it easier. Being here." He said it without looking directly at them, a small concession he permitted himself. "I didn't expect that."</p>
+        <p>Lune was quiet for a moment. When they spoke, their voice had the particular warmth of something said carefully because it was true and they wanted to get it right. "You're easy to like, you know. Underneath the—" they gestured at the general architecture of the space around him, at his posture, his crossed arms, the whole careful apparatus of a person who had learned early that closeness cost something.</p>
+        <p>He huffed — not quite a laugh, but adjacent. "Don't push it."</p>
+        <p>"I mean it," Lune said. They turned to look at him — directly, openly, the way they had looked at him from the very beginning, without any performance of it. "I'm really glad you knocked on the door."</p>
+        <p>He looked at them then — really looked, the way he hadn't let himself look, at the face that had been the first kind face in a long time, at the patience that had not run out, at the person who had given him a room and a meal and enough space to be difficult and had asked for nothing except, perhaps, that he consider staying.</p>
+        <p>He reached over and pulled Lune into a hug. Not careful this time. Not tentative. A real one — his arms around their shoulders, solid and decided and unambiguous. Lune made a small sound of surprise and then settled into it, their arms coming up around him, and they stayed like that for a long, quiet moment in the ordinary Saturday morning of the apartment.</p>
+        <p>"I'm glad too," Beanito said. Into their hair, low and clear, without hedging. He meant it without reservation, and that was — for someone who had spent a long time not meaning things out loud, not letting himself mean things — a considerable thing.</p>
+        <div class="scene-break">· · ·</div>
+        <p>Later, when he finally went back to his room, he left the door open behind him.</p>
+        <p>He had not done that once in all the weeks before today. It was a small gesture — barely a gesture at all — but it was a specific one, with a specific meaning, the kind of thing that does not need to be said because it already has been.</p>
+        <p>Lune noticed. Lune said nothing, because they understood, as they had understood from the beginning, that for some people an open door was the whole sentence.</p>
+        <p>Outside, the city went about its ordinary afternoon. In the kitchen, the plants on the windowsill turned their small faces toward the light, the way they always did, the way green things do when the conditions are finally right. And in room 482, for the first time in longer than either of them could easily measure, two people were simply, quietly, and without ceremony, no longer alone.</p>
+        <div class="ch-end">✦</div>
+      </div>
+    </section>
+
+  </article>
+</div>
+
+<footer>The Shelf &nbsp;·&nbsp; A Private Library</footer>
+
+<script>
+  const root = document.documentElement;
+  const applyTheme = t => {
+    root.setAttribute('data-theme', t);
+    localStorage.setItem('shelf-theme', t);
+    document.querySelectorAll('.theme-opt').forEach(o => o.classList.toggle('active', o.dataset.t === t));
+  };
+  applyTheme(localStorage.getItem('shelf-theme') || 'light');
+  document.querySelectorAll('.theme-opt').forEach(o => o.addEventListener('click', () => applyTheme(o.dataset.t)));
+
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('overlay');
+  const openD   = () => { drawer.classList.add('open');  overlay.classList.add('open'); };
+  const closeD  = () => { drawer.classList.remove('open'); overlay.classList.remove('open'); };
+  document.getElementById('settings-btn').addEventListener('click', openD);
+  document.getElementById('drawer-close').addEventListener('click', closeD);
+  overlay.addEventListener('click', closeD);
+
+  const allProse = document.querySelectorAll('.prose');
+  let fs = parseFloat(localStorage.getItem('shelf-fontsize') || '20');
+  const setFs = v => {
+    fs = Math.min(28, Math.max(16, v));
+    allProse.forEach(p => p.style.setProperty('--fs', fs + 'px'));
+    localStorage.setItem('shelf-fontsize', fs);
+  };
+  setFs(fs);
+  document.getElementById('font-up').addEventListener('click', () => setFs(fs + 1.5));
+  document.getElementById('font-down').addEventListener('click', () => setFs(fs - 1.5));
+
+  const fill = document.getElementById('reading-bar-fill');
+  window.addEventListener('scroll', () => {
+    const pct = Math.min(100, (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+    fill.style.width = pct + '%';
+    const prog = JSON.parse(localStorage.getItem('shelf-progress') || '{}');
+    prog['novels/room-482.html'] = Math.round(pct);
+    localStorage.setItem('shelf-progress', JSON.stringify(prog));
+  }, { passive: true });
+
+  const chapters = document.querySelectorAll('.chapter');
+  const tocLinks = document.querySelectorAll('.toc a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.toc a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-25% 0px -65% 0px' });
+  chapters.forEach(c => obs.observe(c));
+</script>
+
+</body>
+</html>
