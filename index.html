@@ -1,278 +1,447 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Shelf — Novel Reader</title>
+  <title>The Shelf</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --ink:      #0f0d0b;
-      --paper:    #f5f0e8;
-      --cream:    #ede6d8;
-      --warm:     #c8b99a;
-      --accent:   #5c3d2e;
-      --muted:    #8a7560;
-      --rule:     #d4c8b4;
+    [data-theme="light"] {
+      --bg:        #f7f3ed;
+      --surface:   #eee8dc;
+      --ink:       #1a1612;
+      --muted:     #7a6f62;
+      --rule:      #ddd6c8;
+      --accent:    #5c3d2e;
+      --tag-bg:    #e4ddd0;
+      --nav-bg:    rgba(247,243,237,0.94);
     }
 
-    html, body {
-      height: 100%;
-      background: var(--paper);
+    [data-theme="dark"] {
+      --bg:        #0f0e0a;
+      --surface:   #1a1813;
+      --ink:       #e4ddd0;
+      --muted:     #6e6455;
+      --rule:      #282318;
+      --accent:    #bf8f55;
+      --tag-bg:    #201e18;
+      --nav-bg:    rgba(15,14,10,0.94);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
       color: var(--ink);
       font-family: 'EB Garamond', Georgia, serif;
       -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
     }
 
-    /* ── Header ── */
-    header {
-      padding: 60px 48px 40px;
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 52px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--rule);
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: flex-end;
+      padding: 0 28px;
+      transition: background 0.3s, border-color 0.3s;
     }
 
-    .site-title {
+    .nav-brand {
       font-family: 'Cinzel', serif;
-      font-weight: 400;
-      font-size: 13px;
-      letter-spacing: 0.25em;
+      font-size: 11px;
+      letter-spacing: 0.3em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: var(--ink);
+      text-decoration: none;
     }
 
-    .site-tagline {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 15px;
+    .icon-btn {
+      width: 34px; height: 34px;
+      border: none;
+      background: none;
+      border-radius: 7px;
+      cursor: pointer;
       color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .icon-btn:hover { background: var(--surface); color: var(--ink); }
+    .icon-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── Settings ── */
+    .overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.25);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+
+    .settings-drawer {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      z-index: 201;
+      width: 280px;
+      background: var(--bg);
+      border-left: 1px solid var(--rule);
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), background 0.3s, border-color 0.3s;
+    }
+    .settings-drawer.open { transform: translateX(0); }
+
+    .drawer-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .drawer-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .drawer-body { padding: 28px 20px; display: flex; flex-direction: column; gap: 28px; }
+
+    .setting-row > span {
+      font-family: 'Cinzel', serif;
+      font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--muted);
+      display: block; margin-bottom: 14px;
+    }
+
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .theme-opt {
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 12px 10px 10px;
+      cursor: pointer;
+      background: var(--surface);
+      display: flex; flex-direction: column; gap: 8px;
+      transition: border-color 0.15s;
+    }
+    .theme-opt:hover { border-color: var(--muted); }
+    .theme-opt.active { border-color: var(--accent); }
+
+    .swatch {
+      width: 100%; height: 32px; border-radius: 4px; border: 1px solid var(--rule);
+    }
+    .swatch.light { background: #f7f3ed; }
+    .swatch.dark  { background: #0f0e0a; }
+
+    .theme-opt span {
+      font-family: 'Cinzel', serif;
+      font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); text-align: center;
     }
 
     /* ── Main ── */
     main {
-      max-width: 900px;
+      max-width: 700px;
       margin: 0 auto;
-      padding: 64px 48px 120px;
+      padding: 88px 28px 96px;
     }
 
-    .section-label {
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 40px;
-    }
-
-    /* ── Novel Card ── */
-    .novel-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .novel-card {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 40px;
-      padding: 48px 0;
+    /* Intro */
+    .intro {
+      padding-bottom: 40px;
       border-bottom: 1px solid var(--rule);
-      text-decoration: none;
-      color: inherit;
-      transition: background 0.2s;
-      cursor: pointer;
+      margin-bottom: 36px;
     }
 
-    .novel-card:first-child { border-top: 1px solid var(--rule); }
-
-    .novel-card:hover .cover-wrap { transform: translateY(-4px); }
-    .novel-card:hover .novel-title { color: var(--accent); }
-
-    /* Cover */
-    .cover-wrap {
-      transition: transform 0.3s ease;
-    }
-
-    .cover {
-      width: 160px;
-      height: 220px;
-      object-fit: cover;
-      display: block;
-      border: 1px solid var(--rule);
-    }
-
-    .cover-placeholder {
-      width: 160px;
-      height: 220px;
-      background: var(--ink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .cover-placeholder::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        repeating-linear-gradient(
-          -45deg,
-          transparent,
-          transparent 6px,
-          rgba(255,255,255,0.02) 6px,
-          rgba(255,255,255,0.02) 7px
-        );
-    }
-
-    .cover-placeholder-title {
+    .intro-eyebrow {
       font-family: 'Cinzel', serif;
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.6);
-      text-align: center;
-      padding: 16px;
-      line-height: 1.8;
-    }
-
-    /* Meta */
-    .novel-meta {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .novel-genre {
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
+      font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase;
       color: var(--muted);
+      display: block; margin-bottom: 12px;
     }
 
-    .novel-title {
+    .intro-title {
       font-family: 'Cormorant Garamond', serif;
       font-weight: 300;
-      font-size: 36px;
-      line-height: 1.1;
+      font-size: 38px; line-height: 1.1;
       color: var(--ink);
-      transition: color 0.2s;
+    }
+    .intro-title em { font-style: italic; color: var(--accent); }
+
+    .stats {
+      display: flex; gap: 28px; margin-top: 24px;
     }
 
-    .novel-author {
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px; font-weight: 300;
+      color: var(--ink); display: block;
+    }
+    .stat-lbl {
+      font-family: 'Cinzel', serif;
+      font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--muted); display: block;
+    }
+
+    /* Filters */
+    .filters {
+      display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 28px;
+    }
+
+    .chip {
+      font-family: 'Cinzel', serif;
+      font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--rule);
+      background: none;
+      border-radius: 100px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .chip.active, .chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--tag-bg);
+    }
+
+    /* ── Cards ── */
+    .card-list { display: flex; flex-direction: column; }
+
+    .card {
+      display: flex; gap: 24px; align-items: flex-start;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--rule);
+      text-decoration: none; color: inherit;
+    }
+    .card:first-child { border-top: 1px solid var(--rule); }
+
+    .card-thumb {
+      flex-shrink: 0;
+      width: 72px; height: 100px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.25s ease;
+    }
+    .card:hover .card-thumb { transform: translateY(-3px); }
+
+    .thumb-text {
+      font-family: 'Cinzel', serif;
+      font-size: 7px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-align: center; padding: 6px; line-height: 1.9;
+    }
+
+    .card-info { flex: 1; display: flex; flex-direction: column; gap: 7px; padding-top: 2px; }
+
+    .card-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .ctag {
+      font-family: 'Cinzel', serif;
+      font-size: 7px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--muted); background: var(--tag-bg);
+      border-radius: 3px; padding: 3px 7px;
+    }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 24px; line-height: 1.1;
+      color: var(--ink); transition: color 0.2s;
+    }
+    .card:hover .card-title { color: var(--accent); }
+
+    .card-desc {
       font-family: 'EB Garamond', serif;
-      font-style: italic;
-      font-size: 16px;
+      font-size: 15.5px; line-height: 1.62;
       color: var(--muted);
     }
 
-    .novel-excerpt {
-      font-family: 'EB Garamond', serif;
-      font-size: 17px;
-      line-height: 1.7;
-      color: #4a4035;
-      max-width: 480px;
-      margin-top: 8px;
+    .progress-track {
+      height: 1.5px; background: var(--rule); border-radius: 2px;
+      margin-top: 6px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: var(--accent); border-radius: 2px;
     }
 
-    .novel-chapters {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 8px;
+    .card-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 4px;
     }
-
-    .chapters-count {
+    .card-meta {
       font-family: 'Cinzel', serif;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--warm);
+      font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted);
     }
-
-    .read-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+    .card-cta {
       font-family: 'Cinzel', serif;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
+      font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase;
       color: var(--accent);
-      margin-top: 20px;
+      display: flex; align-items: center; gap: 5px;
     }
-
-    .read-cta::after {
-      content: '→';
-      font-family: Georgia, serif;
-      font-size: 14px;
-      letter-spacing: 0;
-    }
+    .card-cta::after { content: '→'; font-family: Georgia, serif; font-size: 12px; letter-spacing: 0; }
 
     /* ── Footer ── */
     footer {
-      text-align: center;
-      padding: 40px;
+      text-align: center; padding: 28px;
       font-family: 'Cinzel', serif;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--rule);
-      border-top: 1px solid var(--rule);
+      font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--rule); border-top: 1px solid var(--rule);
     }
 
-    @media (max-width: 680px) {
-      header { padding: 40px 24px 28px; }
-      main { padding: 40px 24px 80px; }
-      .novel-card { grid-template-columns: 120px 1fr; gap: 24px; }
-      .cover-placeholder, .cover { width: 120px; height: 165px; }
-      .novel-title { font-size: 28px; }
+    @media (max-width: 500px) {
+      nav { padding: 0 18px; }
+      main { padding: 76px 18px 80px; }
+      .intro-title { font-size: 30px; }
+      .settings-drawer { width: 100%; }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <span class="site-title">The Shelf</span>
-    <span class="site-tagline">A reader's library</span>
-  </header>
+<nav>
+  <a class="nav-brand" href="index.html">The Shelf</a>
+  <button class="icon-btn" id="settings-btn" aria-label="Settings">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+</nav>
 
-  <main>
-    <p class="section-label">All Novels</p>
+<div class="overlay" id="overlay"></div>
 
-    <div class="novel-grid">
-
-      <!-- Novel 1 -->
-      <a class="novel-card" href="novels/the-unknown-entity.html">
-        <div class="cover-wrap">
-          <div class="cover-placeholder">
-            <span class="cover-placeholder-title">The<br/>Unknown<br/>Entity</span>
-          </div>
+<div class="settings-drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="drawer-label">Settings</span>
+    <button class="icon-btn" id="drawer-close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="setting-row">
+      <span>Theme</span>
+      <div class="theme-grid">
+        <div class="theme-opt active" data-t="light">
+          <div class="swatch light"></div>
+          <span>Light</span>
         </div>
-        <div class="novel-meta">
-          <span class="novel-genre">Dark Fantasy · Supernatural Horror</span>
-          <h2 class="novel-title">The Unknown Entity</h2>
-          <span class="novel-author">— A Story of Ardy</span>
-          <p class="novel-excerpt">When the thing wearing Viktor's voice called from the darkened living room, Ardy already knew something was wrong. What followed would unravel the boundary between terror and wonder.</p>
-          <div class="novel-chapters">
-            <span class="chapters-count">1 Chapter Available</span>
-          </div>
-          <span class="read-cta">Begin Reading</span>
+        <div class="theme-opt" data-t="dark">
+          <div class="swatch dark"></div>
+          <span>Dark</span>
         </div>
-      </a>
-
+      </div>
     </div>
-  </main>
+  </div>
+</div>
 
-  <footer>The Shelf &nbsp;·&nbsp; A Private Library</footer>
+<main>
+  <div class="intro">
+    <span class="intro-eyebrow">Your Library</span>
+    <h1 class="intro-title">Stories worth<br><em>reading.</em></h1>
+    <div class="stats">
+      <div><span class="stat-num">2</span><span class="stat-lbl">Novels</span></div>
+      <div><span class="stat-num">8</span><span class="stat-lbl">Chapters</span></div>
+    </div>
+  </div>
 
+  <div class="filters">
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="slice-of-life">Slice of Life</button>
+    <button class="chip" data-filter="dark-fantasy">Dark Fantasy</button>
+    <button class="chip" data-filter="horror">Horror</button>
+  </div>
+
+  <div class="card-list">
+
+    <a class="card" href="novels/every-small-thing.html" data-genres="slice-of-life found-family">
+      <div class="card-thumb">
+        <span class="thumb-text">Every<br/>Small<br/>Thing</span>
+      </div>
+      <div class="card-info">
+        <div class="card-tags">
+          <span class="ctag">Slice of Life</span>
+          <span class="ctag">Found Family</span>
+        </div>
+        <h2 class="card-title">Every Small Thing</h2>
+        <p class="card-desc">Wren woke on a city pavement with no name, no past, and no one. By nightfall, she had all three — and more than she'd known to ask for.</p>
+        <div class="progress-track"><div class="progress-fill" id="prog-2" style="width:0%"></div></div>
+        <div class="card-row">
+          <span class="card-meta">5 Chapters · Complete</span>
+          <span class="card-cta">Read</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="card" href="novels/the-unknown-entity.html" data-genres="dark-fantasy horror">
+      <div class="card-thumb">
+        <span class="thumb-text">The<br/>Unknown<br/>Entity</span>
+      </div>
+      <div class="card-info">
+        <div class="card-tags">
+          <span class="ctag">Dark Fantasy</span>
+          <span class="ctag">Horror</span>
+        </div>
+        <h2 class="card-title">The Unknown Entity</h2>
+        <p class="card-desc">A thing wearing Viktor's voice called from the darkened room. What followed unravelled the line between terror and wonder.</p>
+        <div class="progress-track"><div class="progress-fill" id="prog-1" style="width:0%"></div></div>
+        <div class="card-row">
+          <span class="card-meta">3 Chapters · In Progress</span>
+          <span class="card-cta">Read</span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+</main>
+
+<footer>The Shelf &nbsp;·&nbsp; A Private Library</footer>
+
+<script>
+  // Theme
+  const root = document.documentElement;
+  const apply = t => {
+    root.setAttribute('data-theme', t);
+    localStorage.setItem('shelf-theme', t);
+    document.querySelectorAll('.theme-opt').forEach(o => o.classList.toggle('active', o.dataset.t === t));
+  };
+  apply(localStorage.getItem('shelf-theme') || 'light');
+  document.querySelectorAll('.theme-opt').forEach(o => o.addEventListener('click', () => apply(o.dataset.t)));
+
+  // Drawer
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('overlay');
+  const open  = () => { drawer.classList.add('open');  overlay.classList.add('open'); };
+  const close = () => { drawer.classList.remove('open'); overlay.classList.remove('open'); };
+  document.getElementById('settings-btn').addEventListener('click', open);
+  document.getElementById('drawer-close').addEventListener('click', close);
+  overlay.addEventListener('click', close);
+
+  // Filter chips
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+      chip.classList.add('active');
+      const f = chip.dataset.filter;
+      document.querySelectorAll('.card').forEach(card => {
+        card.style.display = (f === 'all' || card.dataset.genres.includes(f)) ? '' : 'none';
+      });
+    });
+  });
+
+  // Reading progress
+  const prog = JSON.parse(localStorage.getItem('shelf-progress') || '{}');
+  const p1 = document.getElementById('prog-1');
+  const p2 = document.getElementById('prog-2');
+  if (p1) p1.style.width = (prog['novels/the-unknown-entity.html'] || 0) + '%';
+  if (p2) p2.style.width = (prog['novels/every-small-thing.html'] || 0) + '%';
+</script>
 </body>
 </html>
