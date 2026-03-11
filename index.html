@@ -347,8 +347,8 @@
     <span class="intro-eyebrow">Your Library</span>
     <h1 class="intro-title">Stories worth<br><em>reading.</em></h1>
     <div class="stats">
-      <div><span class="stat-num">2</span><span class="stat-lbl">Novels</span></div>
-      <div><span class="stat-num">14</span><span class="stat-lbl">Chapters</span></div>
+      <div><span class="stat-num">3</span><span class="stat-lbl">Novels</span></div>
+      <div><span class="stat-num">23</span><span class="stat-lbl">Chapters</span></div>
     </div>
   </div>
 
@@ -360,6 +360,25 @@
   </div>
 
   <div class="card-list">
+
+    <a class="card" href="novels/room-482.html" data-genres="slice-of-life found-family">
+      <div class="card-thumb">
+        <span class="thumb-text">Room<br/>482</span>
+      </div>
+      <div class="card-info">
+        <div class="card-tags">
+          <span class="ctag">Slice of Life</span>
+          <span class="ctag">Found Family</span>
+        </div>
+        <h2 class="card-title">Room 482</h2>
+        <p class="card-desc">Beanito moved in with nowhere else to go. Lune opened the door without suspicion and asked for nothing in return. What followed was quieter, and stranger, and better than either of them expected.</p>
+        <div class="progress-track"><div class="progress-fill" id="prog-3" style="width:0%"></div></div>
+        <div class="card-row">
+          <span class="card-meta">9 Chapters · Complete</span>
+          <span class="card-cta">Read</span>
+        </div>
+      </div>
+    </a>
 
     <a class="card" href="novels/every-small-thing.html" data-genres="slice-of-life found-family">
       <div class="card-thumb">
@@ -442,6 +461,8 @@
   const p2 = document.getElementById('prog-2');
   if (p1) p1.style.width = (prog['novels/the-unknown-entity.html'] || 0) + '%';
   if (p2) p2.style.width = (prog['novels/every-small-thing.html'] || 0) + '%';
+  const p3 = document.getElementById('prog-3');
+  if (p3) p3.style.width = (prog['novels/room-482.html'] || 0) + '%';
 </script>
 </body>
 </html>
