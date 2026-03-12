@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Static — The Shelf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&family=Inconsolata:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Themes ── */
+    [data-theme="light"] {
+      --bg: #f7f3ed; --surface: #eee8dc; --ink: #1a1612; --prose-ink: #2a2218;
+      --muted: #7a6f62; --rule: #ddd6c8; --accent: #5c3d2e; --tag-bg: #e4ddd0;
+      --nav-bg: rgba(247,243,237,0.94); --hero-bg: #080609; --hero-ink: #e8e0d0;
+      /* Emotion colours */
+      --col-shout:    #8b1a1a;
+      --col-whisper:  #9a9085;
+      --col-laugh:    #6b5c2e;
+      --col-breaking: #3b5068;
+      --col-voice:    #3a5a4a;
+      --col-static:   #7a7080;
+      --col-thought-border: #c8bfb0;
+      --col-silence:  #b0a898;
+    }
+    [data-theme="dark"] {
+      --bg: #0f0e0a; --surface: #1a1813; --ink: #e4ddd0; --prose-ink: #cfc8bb;
+      --muted: #6e6455; --rule: #282318; --accent: #bf8f55; --tag-bg: #201e18;
+      --nav-bg: rgba(15,14,10,0.94); --hero-bg: #030205; --hero-ink: #e8e0d0;
+      --col-shout:    #c45050;
+      --col-whisper:  #7a7268;
+      --col-laugh:    #a08844;
+      --col-breaking: #6090b8;
+      --col-voice:    #5a9a7a;
+      --col-static:   #9080a0;
+      --col-thought-border: #302820;
+      --col-silence:  #484038;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--ink); font-family: 'EB Garamond', Georgia, serif; -webkit-font-smoothing: antialiased; transition: background 0.3s, color 0.3s; }
+
+    /* ── Nav ── */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; transition: background 0.3s, border-color 0.3s; }
+    .nav-back { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 7px; transition: color 0.15s; }
+    .nav-back::before { content: '←'; font-family: Georgia, serif; font-size: 13px; letter-spacing: 0; }
+    .nav-back:hover { color: var(--accent); }
+    .nav-center { position: absolute; left: 50%; transform: translateX(-50%); font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); white-space: nowrap; pointer-events: none; }
+    .nav-right { display: flex; align-items: center; gap: 4px; }
+    .icon-btn { width: 34px; height: 34px; border: none; background: none; border-radius: 7px; cursor: pointer; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: background 0.15s, color 0.15s; }
+    .icon-btn:hover { background: var(--surface); color: var(--ink); }
+    .icon-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+
+    .reading-bar { position: fixed; top: 52px; left: 0; right: 0; z-index: 99; height: 2px; }
+    .reading-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.1s linear; }
+
+    /* ── Overlay / Drawer ── */
+    .overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .settings-drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 201; width: 280px; background: var(--bg); border-left: 1px solid var(--rule); transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), background 0.3s, border-color 0.3s; }
+    .settings-drawer.open { transform: translateX(0); }
+    .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--rule); }
+    .drawer-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+    .drawer-body { padding: 28px 20px; display: flex; flex-direction: column; gap: 28px; }
+    .setting-row > .s-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 14px; }
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .theme-opt { border: 1px solid var(--rule); border-radius: 8px; padding: 12px 10px 10px; cursor: pointer; background: var(--surface); display: flex; flex-direction: column; gap: 8px; transition: border-color 0.15s; }
+    .theme-opt:hover { border-color: var(--muted); }
+    .theme-opt.active { border-color: var(--accent); }
+    .swatch { width: 100%; height: 30px; border-radius: 4px; border: 1px solid var(--rule); }
+    .swatch.light { background: #f7f3ed; } .swatch.dark { background: #0f0e0a; }
+    .theme-opt span { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-align: center; }
+    .font-row { display: flex; gap: 8px; }
+    .font-sz-btn { flex: 1; border: 1px solid var(--rule); background: var(--surface); border-radius: 7px; padding: 10px; cursor: pointer; font-family: 'EB Garamond', serif; color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 15px; transition: border-color 0.15s, background 0.15s; }
+    .font-sz-btn:hover { border-color: var(--accent); background: var(--tag-bg); }
+
+    /* ── Legend panel ── */
+    .legend {
+      max-width: 660px; margin: 0 auto 0; padding: 18px 28px;
+      background: var(--surface); border: 1px solid var(--rule);
+      font-family: 'Cinzel', serif; font-size: 8.5px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--muted);
+      display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center;
+    }
+    .legend-item { display: flex; align-items: center; gap: 7px; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Hero ── */
+    .hero { background: var(--hero-bg); padding: 110px 28px 70px; text-align: center; position: relative; overflow: hidden; transition: background 0.3s; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 60%, rgba(40,20,60,0.35) 0%, transparent 70%); pointer-events: none; }
+    .hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(180,160,200,0.12), transparent); }
+    .hero-eye { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(180,160,200,0.4); margin-bottom: 18px; display: block; }
+    .hero-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(52px, 9vw, 88px); line-height: 1; color: var(--hero-ink); margin-bottom: 14px; letter-spacing: 0.06em; }
+    .hero-sub { font-family: 'EB Garamond', serif; font-style: italic; font-size: 17px; color: rgba(200,185,220,0.35); margin-bottom: 6px; }
+    .hero-days { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(180,160,200,0.25); margin-top: 12px; }
+
+    /* ── Layout ── */
+    .layout { display: grid; grid-template-columns: 200px 1fr; max-width: 1000px; margin: 0 auto; padding: 0 28px; gap: 64px; align-items: start; }
+    .toc { position: sticky; top: 72px; padding: 48px 0; }
+    .toc-lbl { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 20px; }
+    .toc ul { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+    .toc a { font-family: 'EB Garamond', serif; font-size: 14.5px; color: var(--muted); text-decoration: none; padding: 7px 10px; display: block; border-left: 1px solid transparent; transition: color 0.2s, border-color 0.2s; line-height: 1.4; }
+    .toc a:hover, .toc a.active { color: var(--accent); border-left-color: var(--accent); }
+
+    /* ── Chapter ── */
+    .reading { padding: 56px 0 100px; }
+    .chapter { margin-bottom: 80px; }
+    .ch-head { margin-bottom: 40px; padding-bottom: 28px; border-bottom: 1px solid var(--rule); }
+    .ch-day { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 5px; }
+    .ch-num { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 10px; }
+    .ch-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 34px; line-height: 1.12; color: var(--ink); }
+    .ch-epigraph { margin-top: 18px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 17px; color: var(--muted); padding-left: 20px; border-left: 2px solid var(--rule); line-height: 1.6; }
+
+    /* ── Prose ── */
+    .prose { --fs: 20px; font-family: 'EB Garamond', Georgia, serif; font-size: var(--fs); line-height: 1.86; color: var(--prose-ink); }
+    .prose p { margin-bottom: 1.45em; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    .prose p + p { text-indent: 1.4em; }
+    .prose p:first-of-type { text-indent: 0; }
+    .prose p:first-of-type::first-letter { font-family: 'Cormorant Garamond', serif; font-size: 4.4em; font-weight: 300; line-height: 0.8; float: left; margin-right: 0.08em; margin-top: 0.06em; color: var(--accent); }
+
+    /* ──────────────────────────────────────────
+       EMOTION / FORMATTING CLASSES
+    ────────────────────────────────────────── */
+
+    /* SHOUTING — raw, uncontrolled volume */
+    .shout {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 1.08em;
+      letter-spacing: 0.06em;
+      color: var(--col-shout);
+      text-transform: uppercase;
+    }
+
+    /* WHISPERING — fading, barely there */
+    .whisper {
+      font-size: 0.84em;
+      color: var(--col-whisper);
+      letter-spacing: 0.01em;
+      opacity: 0.75;
+    }
+
+    /* BITTER LAUGHTER — hollow, the kind that hurts */
+    .laugh {
+      font-style: italic;
+      color: var(--col-laugh);
+      font-size: 0.97em;
+    }
+
+    /* INTERNAL THOUGHT — what she doesn't say aloud */
+    .thought {
+      display: block;
+      margin: 1.6em 0 1.6em 0;
+      padding: 10px 0 10px 20px;
+      border-left: 2px solid var(--col-thought-border);
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.95em;
+      text-indent: 0 !important;
+      line-height: 1.7;
+    }
+    .thought::first-letter { all: unset; }
+
+    /* BREAKING DOWN — voice collapsing, losing it */
+    .breaking {
+      color: var(--col-breaking);
+      font-style: italic;
+      opacity: 0.82;
+    }
+
+    /* THE MOTHER'S VOICE — how Mara hears it: set apart from everything */
+    .voice-line {
+      display: block;
+      margin: 2em 0;
+      padding: 16px 22px 16px 28px;
+      border-left: 3px solid var(--col-voice);
+      background: transparent;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.12em;
+      line-height: 1.72;
+      color: var(--col-voice);
+      text-indent: 0 !important;
+    }
+    .voice-line::first-letter { all: unset; }
+
+    /* STATIC — the voice breaking apart */
+    .static-text {
+      font-family: 'Inconsolata', monospace;
+      font-size: 0.82em;
+      color: var(--col-static);
+      letter-spacing: 0.12em;
+      opacity: 0.7;
+    }
+
+    /* SILENCE BLOCK — the visual weight of total quiet */
+    .silence-block {
+      display: block;
+      text-align: center;
+      margin: 2.8em 0;
+      color: var(--col-silence);
+      font-family: 'Cinzel', serif;
+      font-size: 8.5px;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      opacity: 0.6;
+      user-select: none;
+    }
+
+    /* SCENE BREAK */
+    .scene-break { text-align: center; color: var(--muted); letter-spacing: 0.5em; font-size: 13px; margin: 2.2em 0; user-select: none; }
+
+    /* CHAPTER END */
+    .ch-end { text-align: center; color: var(--muted); font-family: 'Cormorant Garamond', serif; font-size: 18px; margin-top: 48px; opacity: 0.45; }
+
+    /* VERY LAST CHAPTER — slight visual shift, the epilogue feels different */
+    .chapter-epilogue .ch-head { border-bottom-color: transparent; }
+    .chapter-epilogue .prose p:first-of-type::first-letter { color: var(--col-breaking); }
+
+    /* Footer */
+    footer { text-align: center; padding: 28px; font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--rule); border-top: 1px solid var(--rule); }
+
+    @media (max-width: 720px) {
+      nav { padding: 0 18px; }
+      .nav-center { display: none; }
+      .hero { padding: 90px 20px 56px; }
+      .layout { grid-template-columns: 1fr; padding: 0 18px; gap: 0; }
+      .toc { display: none; }
+      .reading { padding: 36px 0 72px; }
+      .settings-drawer { width: 100%; }
+      .legend { padding: 14px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="../index.html">Library</a>
+  <span class="nav-center">Static</span>
+  <div class="nav-right">
+    <button class="icon-btn" id="settings-btn" aria-label="Settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="reading-bar"><div class="reading-bar-fill" id="reading-bar-fill"></div></div>
+<div class="overlay" id="overlay"></div>
+
+<div class="settings-drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="drawer-label">Settings</span>
+    <button class="icon-btn" id="drawer-close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="setting-row">
+      <span class="s-label">Theme</span>
+      <div class="theme-grid">
+        <div class="theme-opt active" data-t="light"><div class="swatch light"></div><span>Light</span></div>
+        <div class="theme-opt" data-t="dark"><div class="swatch dark"></div><span>Dark</span></div>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="s-label">Text Size</span>
+      <div class="font-row">
+        <button class="font-sz-btn" id="font-down">A−</button>
+        <button class="font-sz-btn" id="font-up">A+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <span class="hero-eye">Tragedy · Supernatural · A Novel in Three Days</span>
+  <h1 class="hero-title">STATIC</h1>
+  <p class="hero-sub">She has been hearing her dead mother's voice since she was seven years old.</p>
+  <p class="hero-days">Today it started breaking apart.</p>
+</div>
+
+<!-- Reading guide -->
+<div class="legend">
+  <span style="font-size:9.5px; letter-spacing:0.05em; text-transform:none; font-family:'EB Garamond',serif; color:var(--muted); font-style:italic;">Reading guide —</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--col-voice)"></span> The mother's voice</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--col-shout)"></span> Shouting</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--col-whisper)"></span> Whispering</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--col-breaking)"></span> Breaking down</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--col-static)"></span> Static / fragmenting</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--col-laugh)"></span> Bitter laughter</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--col-thought-border)"></span> Internal thought</span>
+</div>
+
+<div class="layout">
+  <aside class="toc">
+    <span class="toc-lbl">Contents</span>
+    <ul>
+      <li><a href="#ch1" class="active">I — The Morning It Breaks</a></li>
+      <li><a href="#ch2">II — What She Built Me</a></li>
+      <li><a href="#ch3">III — The Woman Who Knows</a></li>
+      <li><a href="#ch4">IV — Everything I Never Said</a></li>
+      <li><a href="#ch5">V — Day Two. Static.</a></li>
+      <li><a href="#ch6">VI — The Last Night</a></li>
+      <li><a href="#ch7">VII — After</a></li>
+    </ul>
+  </aside>
+
+  <article class="reading">
+
+    <!-- ── Chapter I ── -->
+    <section class="chapter" id="ch1">
+      <div class="ch-head">
+        <span class="ch-day">Day One</span>
+        <span class="ch-num">Chapter I</span>
+        <h2 class="ch-title">The Morning It Breaks</h2>
+        <p class="ch-epigraph">"She was born without hearing.<br>The doctors said she would never know what sound was like.<br>They were wrong. She just had to wait for someone to die."</p>
+      </div>
+      <div class="prose">
+        <p>Mara has been deaf since before she had language to describe it. This is important to understand: she did not lose her hearing. She never had it. The world came to her in shapes and light and the vibrations of floors under her feet, and she built a full and serviceable life from these things, and she did not miss what she had never possessed.</p>
+        <p>What she could hear was something else entirely.</p>
+        <p>She discovered it at age seven, two weeks after her mother died, when she woke in the dark and heard, with perfect clarity in a part of her mind that had no anatomical address, her mother's voice saying her name.</p>
+
+        <span class="voice-line">Mara. Baby. I'm still here.</span>
+
+        <p>She had screamed. She was seven and she had just buried her mother and a voice was speaking inside her skull with the warm and unmistakable cadence of the person she had loved most in the world, and she screamed and screamed, and her aunt came running, and Mara couldn't explain it because she communicated through sign and her hands were shaking too hard to sign anything, and eventually she was held and rocked and given warm milk and told she'd had a nightmare.</p>
+        <p>She hadn't had a nightmare.</p>
+
+        <span class="thought">She said: I'm still here. Those exact words. I know my mother's voice. I have always known my mother's voice, from the vibration of her chest when she held me close, from the way the whole room changed quality when she was speaking. I know her voice. That was her voice.</span>
+
+        <p>By age nine she had stopped trying to explain it. By twelve she had accepted it the way she accepted her deafness: as a fact of her particular body, one that set her apart from other people in a way that couldn't be helped and wasn't worth resisting. The voice was her mother. Her mother was dead. The voice persisted anyway, every morning when she woke and every night before she slept and throughout the long middle hours of every day, commenting and advising and laughing at things she found funny and going quiet when she was tired. The voice was as real to Mara as the floor under her feet.</p>
+        <p>Twenty-one years of this. Mara is twenty-eight.</p>
+        <p>This is Thursday morning, and the voice is quieter than it has ever been.</p>
+        <p>Not gone. Not silent. But thin — the way a radio signal goes thin at the edge of a broadcast range, not static yet but edged with the suggestion of it, the quality of something struggling to maintain itself. Mara notices it the moment she wakes, the way you notice a change in air pressure before rain. She lies in bed and waits.</p>
+
+        <span class="voice-line">Good morning, baby.</span>
+
+        <p>Four words. Usually the morning greeting is long — her mother has always been a morning person, even in death, enthusiastic about the new day in a way that Mara, who is definitively not a morning person, has always found both insufferable and necessary. Usually there is commentary about the light through the curtains, observations about what Mara should eat for breakfast, reminders about things she's supposed to do today.</p>
+        <p>Today: four words, and then a quiet that sits differently than ordinary quiet.</p>
+        <p>Mara sits up. She signs — not to communicate, but because she has always used sign to think, the way other people use spoken words to form their thoughts, and right now she needs to think clearly.</p>
+
+        <span class="thought">Something is wrong. Something is different. She's been consistent for twenty-one years — she's never once been quieter than this, not when I was sick, not when Joel and I fought for a week, not when I lost the job at the gallery and didn't get out of bed for four days and she talked to me for hours about nothing just to keep me here. Why now. Why today.</span>
+
+        <p>She gets up. She makes coffee. Joel is still asleep — she can feel the warmth from the bedroom, the particular weight of someone else existing in the flat, which is its own kind of comfort. She stands at the kitchen window with her mug and watches the street.</p>
+        <p>She waits for more.</p>
+        <p>The voice does not come again for four hours.</p>
+        <p>When it does, it says only:</p>
+
+        <span class="voice-line"><span class="static-text">M—</span> I need to tell you something. Not yet. But soon. Don't be scared, okay? <span class="static-text">—oka—</span></span>
+
+        <p>And then nothing.</p>
+        <p>Mara puts her coffee down. Her hands are very steady. Her heart is not.</p>
+
+        <span class="thought">That was static. That was interference in the middle of her voice. In twenty-one years there has never been interference. The voice has always been clean. Clear. Exactly as I remember it from when she was alive. What does it mean when the dead start to break up.</span>
+
+        <p>She already knows. She has always known, in the abstract, that this could not go on forever. The old woman on Clemence Street — the only other person Mara has ever met with the gift, found in the third year after her mother died — told her once, carefully, that souls did not linger unless they had a reason, and the reasons were always finite, and eventually every reason ran out.</p>
+        <p><span class="whisper">Eventually every reason runs out.</span></p>
+        <p>Mara picks her coffee back up. She drinks it. Joel comes through in yesterday's shirt, squinting at the light, and touches her shoulder on his way to the kettle, and she watches his back and thinks:</p>
+
+        <span class="thought">I am not ready. I have never been ready. I have had twenty-one years and I am not ready and I do not know how to be a person in silence and I do not want to learn.</span>
+
+        <p>"You okay?" Joel signs.</p>
+        <p>She signs back: <em>Fine. Just tired.</em></p>
+        <p>She has been lying to Joel about this since they met four years ago. Not maliciously. Just in the way that a person keeps the most essential truth of their life private until the right moment arrives to share it, and the right moment keeps not quite arriving, and then so much time has passed that telling the truth would require explaining the lie, and the lie is the size of her entire life.</p>
+        <p>She signs: <em>I love you.</em></p>
+        <p>He signs back, still facing the kettle, without turning: <em>I love you too, weirdo.</em></p>
+        <p>She almost laughs. Then doesn't.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter II ── -->
+    <section class="chapter" id="ch2">
+      <div class="ch-head">
+        <span class="ch-day">Day One, continued</span>
+        <span class="ch-num">Chapter II</span>
+        <h2 class="ch-title">What She Built Me</h2>
+        <p class="ch-epigraph">"I thought I was living my life.<br>I did not understand, for a very long time, that I was living hers instead."</p>
+      </div>
+      <div class="prose">
+        <p>This is what Mara's mother built from the other side of death, in twenty-one years of continuous presence:</p>
+        <p>A florist shop on Renwick Road. Her mother had always wanted to open a florist shop — she had mentioned it often, when Mara was small, the specific dream of it: a small place, nothing ambitious, just flowers and the smell of them and the satisfaction of putting the right ones in someone's hands. Mara works in a florist shop on Renwick Road. She has been there since she was nineteen. She is very good at it. She finds it genuinely satisfying, the way she finds very few things genuinely satisfying, and she has never once, in nine years of working there, thought to wonder whether she would have chosen it without her mother's voice in her ear saying, when she was eighteen and trying to figure out what to do with her life: <em>there's a florist shop on Renwick Road hiring, baby. I think you'd be good at it.</em></p>
+        <p>An apartment with a bay window. Her mother's voice, emphatic, when Mara was viewing flats at twenty-two: <em>The bay window one. Take the bay window one, baby, you'll thank me. You need light in a home.</em> She took the bay window one. The morning light is extraordinary. She has sat in it every morning for six years and found it extraordinary. She does not know whether she would have noticed it, would have called it extraordinary, if no voice had been telling her for six years that light in a home was essential.</p>
+        <p>Joel. Her mother's voice, when Mara was twenty-four and about to end a relationship with a kind and patient man because she was afraid of it getting serious: <em>Don't, Mara. That one stays. I can feel it from here, I know it's silly but I can, and that one stays.</em> She did not end it. It got serious. She has been with Joel for four years and she loves him in the specific, anchoring, unremarkable way that real love turns out to be — not like the songs, not consuming, just the steady and reliable fact of another person's presence making the world more possible. She chose this. But she was also told to choose it.</p>
+
+        <span class="thought">How much of my life is mine. I'm asking this for the first time. Why am I asking it for the first time. I have had twenty-one years to ask this and I have never asked it, and now, on the morning the voice starts breaking up, I am asking it, and I don't know what the answer is, and I think that might be the most frightening thing I have ever not known.</span>
+
+        <p>She is in the shop — Thursday is always the shop — arranging winter flowers, the white ones she loves most, when the voice comes back in the afternoon.</p>
+        <p>It is stronger now than this morning. She doesn't know whether to feel relieved or more frightened. The static is not gone. It lives at the edges of every word, a faint crackle, the sound of a frequency struggling.</p>
+
+        <span class="voice-line">I've been thinking about how to say this for a while. <span class="static-text">—while—</span> I was going to wait but I think waiting was making it worse. Can you listen? I know you're working.</span>
+
+        <p>Mara sets down the flowers. She tilts her head very slightly — the unconscious gesture she has always made when the voice is speaking — and anyone watching would see a young woman pausing in her work with her eyes unfocused and her hands still, which is exactly what her colleagues have seen on various occasions and which they have learned, over time, to leave alone.</p>
+
+        <span class="voice-line">I've been holding on because I was scared of what it would mean to stop. I want you to know that. It wasn't for you, not entirely. Some of it was for me. I was scared of the — <span class="static-text">—what comes afte—</span> — the part after this. I didn't want to find out what it was.</span>
+
+        <p>Mara's hands are moving without her permission, forming small signs against her thigh — fragments of the response she would give if she could respond aloud, which she cannot, because she is at work, and because the voice does not hear her when she speaks or signs, and has never heard her, and this is the thing about her relationship with her mother's ghost that no one else in her life knows: it is entirely one-directional. Her mother speaks. Mara listens. Mara has never once, in twenty-one years, been able to say anything back.</p>
+        <p>She has been having a conversation with someone who cannot hear her since she was seven years old.</p>
+
+        <span class="thought">Of course she can't hear me. The dead can broadcast. They can't receive. All this time — twenty-one years of wanting to answer her, wanting to tell her I was okay, wanting to say thank you, wanting to say I love you, wanting to say I'm scared, wanting to ask her to stay — and she never heard any of it. None of it. Twenty-one years of me talking to myself.</span>
+
+        <p>The thought arrives not like a revelation but like the recognition of something she has always known and kept very carefully not-thought. And sitting with it, finally, is one of the loneliest things she has ever felt.</p>
+
+        <span class="voice-line">Mara? Are you listening? <span class="static-text">—ara—</span> I can tell when you're listening.</span>
+
+        <p>The laugh that comes out of Mara's chest is not a happy laugh. It is the kind that happens when something is too painful to cry about yet. <span class="laugh">She can tell when I'm listening. Twenty-one years and she can tell when I'm listening. She has always been able to tell. She has never been able to hear what I say back.</span></p>
+        <p>She puts her hand over her mouth.</p>
+        <p>Across the shop, her colleague Priya glances over, sees Mara's face, and silently comes to take over the arrangement without asking, which is an act of uncomplicated kindness that Mara will think about for a long time.</p>
+        <p>She goes into the back room. She sits on the step stool among the buckets. She signs into the air, the way she has always signed into the air, knowing it changes nothing and doing it anyway.</p>
+        <p><em>I'm listening, Mum. I'm always listening. I am always, always listening.</em></p>
+      </div>
+    </section>
+
+    <!-- ── Chapter III ── -->
+    <section class="chapter" id="ch3">
+      <div class="ch-head">
+        <span class="ch-day">Day One, evening</span>
+        <span class="ch-num">Chapter III</span>
+        <h2 class="ch-title">The Woman Who Knows</h2>
+        <p class="ch-epigraph">"There is a kind of cruelty in being the only one who can explain a terrible thing to someone.<br>Nadia had been that person too many times to pretend it got easier."</p>
+      </div>
+      <div class="prose">
+        <p>Nadia lives on Clemence Street in a flat that smells of old paper and something Mara has never been able to identify, something mineral and faintly sweet, the scent of a home that has held a lot of grief over a very long time. She is eighty-three years old. She lost her husband when she was twenty-six and heard his voice for forty-one years until it stopped, and she has never described what happened after the stopping as anything other than what it was: the worst thing that ever happened to her, worse than the death itself, because she had gotten used to the death.</p>
+        <p>Mara knocks on her door at seven in the evening.</p>
+        <p>Nadia opens it, takes one look at Mara's face, and steps aside without speaking. This is Nadia's way: she reads faces the way other people read text, with speed and accuracy and without any wasted motion in the response.</p>
+        <p>They sit at the kitchen table. Nadia makes tea. Mara explains through sign — Nadia learned to sign decades ago, specifically for Mara, which is the kind of thing Mara has never been able to think about too directly without her eyes filling up. She explains about the static. About this morning. About the voice saying it needed to tell her something.</p>
+        <p>Nadia's expression, throughout this, is very still and very careful. The expression of someone holding their own feeling firmly to one side in order to give full attention to someone else's.</p>
+        <p>When Mara finishes, Nadia folds her hands around her mug. She speaks aloud, which Mara follows by lip-reading, which she is very good at, which people always forget she is doing and mistake for blank attention.</p>
+        <p>"How long?" Nadia says.</p>
+        <p>Mara signs: <em>Twenty-one years.</em></p>
+        <p>Nadia nods. Something moves across her face — not surprise. "She held on a long time," she says. "That's love, but it's also fear. They're the same thing, often, when they go on that long."</p>
+        <p>Mara signs: <em>How long do I have?</em></p>
+        <p>"With Rafiq," — her husband — "there was about a week between when it started to change and when it went quiet. For others I've spoken to over the years it's been faster. A day or two." She pauses. "Some go in a single night."</p>
+
+        <span class="thought">A day or two. One night. Twenty-one years and she could be gone in one night. I've had her for twenty-one years and she could be gone in one night and I have never once been able to say a single word back to her.</span>
+
+        <p>Mara signs: <em>She can't hear me. She's never been able to hear me. All this time, she couldn't hear me at all, could she?</em></p>
+        <p>Nadia is quiet for a moment. Then she says, carefully: "Not your words. No." A pause. "But Mara — she has been with you every day for twenty-one years. She has felt every emotion you've had. She has known your sadness and your joy and the quality of your attention. She has felt all of it, every day, through the same connection that lets her speak to you. She couldn't hear your words. But she has known you, completely, the whole time." Another pause. "She has never once not known you."</p>
+        <p>Mara puts her hands flat on the table. She keeps them there because if she lifts them she will start signing things she doesn't want to say in someone else's kitchen. There is a trembling in her chest that she is managing, carefully, the way she has learned to manage things that are too large for the room she's currently in.</p>
+        <p>Nadia leans forward and covers Mara's hands with her own.</p>
+        <p>"There's something else," she says. "I should tell you now, because there isn't time not to."</p>
+        <p>Mara looks at her.</p>
+        <p>"The ones who have held on this long — they held on because they were waiting for something. Not because they were afraid to go, or not only that. Because they had not yet done what they stayed to do." Nadia's eyes are very direct. "Your mother has been present for your whole adult life, guiding you, watching over you. But I want you to think about this very carefully: has she been watching over you, or has she been living through you?"</p>
+        <p>The sentence lands with the soft, exact precision of a thing that has been true for a long time and is only now being said aloud for the first time.</p>
+        <p>Mara takes her hands back from Nadia's. She stands. She signs, very carefully, so that every word is clear:</p>
+        <p><em>Both. I think it's been both. And I think she might have just realised that.</em></p>
+        <p>Nadia sits back in her chair. Her eyes are sad and clear and full of something that Mara recognises as love, the specific form of it that belongs to very old people who have lost very much: the love that has been refined by loss until only the essential is left, with nothing wasted and nothing withheld.</p>
+        <p>"Go home," Nadia says. "Be where she can find you tonight."</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter IV ── -->
+    <section class="chapter" id="ch4">
+      <div class="ch-head">
+        <span class="ch-day">Day One, late</span>
+        <span class="ch-num">Chapter IV</span>
+        <h2 class="ch-title">Everything I Never Said</h2>
+        <p class="ch-epigraph">"Twenty-one years of one-sided conversation.<br>Tonight she stopped being careful about it."</p>
+      </div>
+      <div class="prose">
+        <p>Joel is asleep by eleven. He sleeps the way good people sleep: easily, without ceremony, gone within three minutes of putting his head down. Mara lies beside him and looks at the ceiling and waits for the voice and when the voice doesn't come she gets up, because lying still and waiting is a thing she cannot do, has never been able to do.</p>
+        <p>She goes to the bay window. She sits in the chair her mother told her to take the flat for. She looks at the street.</p>
+        <p>And then she starts to sign.</p>
+        <p>Not to communicate — she knows it changes nothing. Nadia confirmed it. Her mother cannot hear. But signing is how Mara thinks, and she needs to think, and what she needs to think about is everything she has not been able to say for twenty-one years, and she is going to say it now, into the dark of her own living room, because she needs it out of her body.</p>
+        <p>She signs: <em>I was so angry at you for so long.</em></p>
+        <p>She signs: <em>Not for dying. I was never angry at you for dying, I know that wasn't your choice, I know you didn't leave me on purpose. I was angry because you stayed. Because you kept staying. Because every time I tried to grieve properly, to go through the loss the way people are supposed to go through losses, you were still there, and grief needs an empty space to move into and you kept filling it.</em></p>
+        <p>She signs: <em>I am twenty-eight years old and I have never properly mourned my mother. How is that possible. You have been dead for twenty-one years and I have never properly mourned you because you were never properly gone.</em></p>
+        <p>Her hands are moving faster now, the signs running together in the way they do when emotion overtakes the care she usually takes with language.</p>
+        <p><em>The flower shop. I love the flower shop. I want to be clear about that, I genuinely love it, but Mum — was that mine? Was any of it mine? I live in your flat, in a manner of speaking. I stayed with your boyfriend, in a manner of speaking. I went to your job. I am twenty-eight and I have made almost none of my own decisions and I don't know what I would decide if the voice in my head telling me what to choose went away, and</em></p>
+        <p>She stops.</p>
+        <p>Her hands go still in her lap.</p>
+
+        <span class="thought">And it's going away. That's what's happening. The voice is going away. And I'm sitting here being angry about the wrong thing, I'm sitting here cataloguing the ways I've been shaped by someone who loved me too much to leave, and she is dying — she is dying again, finally, properly, and in a day or two there will be silence where she used to be, and I —</span>
+
+        <p>The voice comes. Without warning, without the usual gradual sense of it approaching. It arrives all at once, the way her mother used to arrive at doorways: suddenly, completely present.</p>
+
+        <span class="voice-line">Mara. <span class="static-text">—ara—</span> I know you're awake. I can feel how awake you are.</span>
+
+        <p>Mara's hands slam down on her thighs, not in anger but in the desperate attempt to hold herself together, to not fall apart before the voice has said what it needs to say.</p>
+
+        <span class="voice-line">I've been feeling what you feel all day. Since this morning. I could feel all of it. I know you can't hear me hearing it, I know it's always felt one-directional to you, but it isn't, baby, it has never been one-directional. Every time you've been sad I felt it. Every time you were proud of yourself I was so proud too. And today — <span class="static-text">—toda—</span> — I could feel you asking the question. The one you've never asked before.</span>
+
+        <p>Mara is shaking. She is holding herself together with the absolute minimum of force, the way you hold something broken until you can set it down somewhere safe, and there is nowhere safe to set this.</p>
+
+        <span class="voice-line">I'm so sorry. I have been so selfish. I told myself it was for you — that I was staying for you, protecting you, guiding you — and some of it was, some of it was genuinely for you, but Mara — I never got to open my shop. I never got to see you grow up. I never got to do any of the things I had planned and I was twenty-nine when I died and I was not ready and I was so <span class="static-text">—so—</span> angry about it. And you were there, and you could hear me, and I kept talking, and — <span class="static-text">———</span></span>
+
+        <p>The static swallows the next words. Three, four seconds of it — pure fragmenting signal, the worst Mara has heard yet, the voice dissolving and reconstituting and dissolving again.</p>
+        <p>And then:</p>
+
+        <span class="voice-line">— I took your life. I didn't mean to. I loved you so much that I took your life.</span>
+
+        <p>Mara presses her fist against her mouth. She is making a sound — she knows this because she can feel it in her chest and her throat, can feel the vibration of it against her own closed fist. She doesn't know what sound it is. She has never been able to hear the sounds her body makes.</p>
+        <p>She signs into the empty room: <em>You did not take my life. Stop it. Stop saying that.</em></p>
+        <p>She knows her mother can't hear her.</p>
+        <p>She signs it anyway. <span class="shout"><em>You did not take my life. I love the flowers. I love Joel. I love the bay window. I love the way you talk about the morning light. I love every single thing you ever gave me and I am so angry at you and I love you so much and you did not take anything from me, you were just scared, you were twenty-nine and you were scared and so was I, I was seven and I was so scared, and I would take twenty-one years of you again without a second's hesitation, do you hear me, I would take it all again.</em></span></p>
+        <p>The room is silent. The room has always been silent, for Mara, except for the one voice that found its way through.</p>
+        <p>She sits in her mother's bay window, in her mother's life, that is also her life, and she breathes, and she waits, and the night goes on around her.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter V ── -->
+    <section class="chapter" id="ch5">
+      <div class="ch-head">
+        <span class="ch-day">Day Two</span>
+        <span class="ch-num">Chapter V</span>
+        <h2 class="ch-title">Day Two. Static.</h2>
+        <p class="ch-epigraph">"A signal degrades from the outside in.<br>The first thing to go is the edges. The last thing is the name it calls you."</p>
+      </div>
+      <div class="prose">
+        <p>On Friday morning Mara calls in sick to the shop, which she has done a total of four times in nine years. She makes coffee and sits with it and does not move for a long time, and the voice is there but it is more static than voice now, the proportions reversed from yesterday, and what comes through sounds like:</p>
+
+        <span class="voice-line"><span class="static-text">—orning—</span> Good <span class="static-text">——</span> morning <span class="static-text">—ara—</span></span>
+
+        <p>Mara signs <em>good morning</em> back, for the first time in twenty-one years doing it in the full knowledge that it changes nothing, and finding that this does not stop her from doing it.</p>
+        <p>Joel gets up at eight. He makes breakfast. He notices Mara's face — he is good at noticing Mara's face, better than most people, better than she gives him credit for — and he signs: <em>What's wrong?</em></p>
+        <p>She thinks, for a moment, about telling him. About the whole thing, all of it, from the beginning. Seven years old and the voice in the dark. Twenty-one years. The florist shop and the flat and the bay window and the fact that the woman he fell in love with has been half-living someone else's life this whole time and didn't fully know it until yesterday.</p>
+        <p>She signs: <em>My mum. I'm thinking about my mum today.</em></p>
+        <p>Which is true. Which is also the most enormous understatement of her life.</p>
+        <p>Joel puts his arm around her. He doesn't ask anything else. This is one of the things she chose, or was told to choose, or both: a person whose first instinct is to be present rather than to interrogate. She lets herself lean into him and she closes her eyes and she listens to the static where the voice used to be clean and she thinks:</p>
+
+        <span class="thought">She's still in there. She's still trying. I can feel her trying. The same way she's always been able to feel me — I can feel her, right now, on the other side of the static, straining toward me, trying to hold the signal together long enough to say what she needs to say. Mum. Mum, I can feel you. I'm here. I'm right here.</span>
+
+        <p>The day passes in the specific slow-motion of days when you are waiting for something you cannot stop. Mara sits in the bay window and watches the street and the voice comes through in pieces:</p>
+
+        <span class="voice-line"><span class="static-text">——</span> proud of <span class="static-text">—ou—</span></span>
+
+        <span class="voice-line"><span class="static-text">——</span> never told you about <span class="static-text">———</span> the summer before you were born <span class="static-text">——</span> I was so happy <span class="static-text">——</span></span>
+
+        <span class="voice-line"><span class="static-text">——————</span> Joel <span class="static-text">——</span> I was right about Joel <span class="static-text">——</span> wasn't I <span class="static-text">——</span></span>
+
+        <p>Mara, in the gap between this fragment and the next, laughs out loud. <span class="laugh">Twenty-one years and on day two of fading out of existence her mother is still absolutely right about Joel.</span> It is a genuinely funny thing. It is also the most painful funny thing she has ever experienced. She laughs with her hand over her mouth and her eyes full and her shoulders shaking with both at once, which is what grief often is — not purely sad, not purely anything, just everything present at the same time in a body not quite large enough for all of it.</p>
+
+        <span class="voice-line"><span class="static-text">——</span> I can hear you laughing. I can <span class="static-text">——</span> always feel when you laugh. <span class="static-text">———</span> you have your father's laugh. The same <span class="static-text">——</span> shape to it. I always <span class="static-text">——</span> loved that.</span>
+
+        <p>Mara did not know this. She has never known anything about her father — he was not in the picture, was never explained, was a gap in her history that she had made her peace with long ago. She didn't know she had his laugh. She didn't know her laugh had a shape that could be recognised from wherever her mother was.</p>
+        <p>She presses her fist to her chest. She breathes.</p>
+
+        <span class="voice-line"><span class="static-text">———————</span> tonight, baby. I think it will be tonight. <span class="static-text">——</span> I want to do it properly. <span class="static-text">———</span> stay awake for me.</span>
+
+        <p>The static swallows the rest.</p>
+        <p>Mara sits in the bay window with her hand still pressed to her chest and the afternoon light going gold around her and she does not move for a very long time.</p>
+        <p>She signs into the air, because she always does, because she always will: <em>I'll be here. I'm not going anywhere. I am right here.</em></p>
+
+        <span class="silence-block">· · · · · · · · · ·</span>
+
+        <p>She calls Nadia. Nadia answers on the first ring.</p>
+        <p>"Tonight," Mara signs, holding the phone up so Nadia can see her hands on the video call.</p>
+        <p>"I know," says Nadia, who has been expecting this call. "I'll be awake. Call me after."</p>
+        <p>Mara signs: <em>How did you get through it? After Rafiq. The silence. How did you get through the silence.</em></p>
+        <p>Nadia is quiet for a moment. Then she says: "I found out who I was without him. Which was very hard. And also—" she pauses, and something in her expression is very careful, very deliberate, the expression of a woman choosing her next words with the awareness of their weight — "the silence didn't stay empty. Not forever."</p>
+        <p><em>What do you mean?</em></p>
+        <p>"After Rafiq went quiet," Nadia says, "there was about a month of nothing. And then — a different voice. Someone new. A woman I didn't know. She had just died, and she was frightened, and she found me the same way they all find us — because we're the ones who can receive." She pauses. "The gift doesn't stop, Mara. It just — changes who it holds."</p>
+        <p>Mara lowers the phone. She stares at nothing for a moment. Then she raises it again.</p>
+        <p><em>I don't want a different voice. I want hers.</em></p>
+        <p>"I know," says Nadia. "I know, love. I know."</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VI ── -->
+    <section class="chapter" id="ch6">
+      <div class="ch-head">
+        <span class="ch-day">Day Two, night</span>
+        <span class="ch-num">Chapter VI</span>
+        <h2 class="ch-title">The Last Night</h2>
+        <p class="ch-epigraph">"She had wanted to say so many things.<br>In the end she said the only one that mattered, over and over, until there was no frequency left to say it on."</p>
+      </div>
+      <div class="prose">
+        <p>Joel goes to bed at midnight. Mara tells him she'll follow soon. He trusts this and closes the bedroom door and she is alone in the flat with the bay window and the city quiet outside and the static that has been building all evening, thicker now, almost continuous, the voice fighting through it in fragments that cost something each time.</p>
+        <p>She does not know how she knows the moment has come. She simply knows — the way she has always known things, in the particular register her body uses for the things that matter most, the register that has no sound and needs none. She sits in the bay window chair and she waits and the clock on the wall says two fifteen in the morning and the voice arrives.</p>
+        <p>Not in pieces. Not through static. One last time, clearly — the way a failing signal sometimes, at the very end, pulls itself together for a few clean seconds before it goes. Her mother's voice, exactly as she has always heard it, exactly the same voice from that first dark night when she was seven and terrified and it said:</p>
+
+        <span class="voice-line">Mara. Baby. I'm still here.</span>
+
+        <p>And now:</p>
+
+        <span class="voice-line">Mara. Baby. I need to go.</span>
+
+        <p>Mara is crying. She has been crying, she thinks, for approximately two days, with interruptions for sleep and coffee and holding herself together in front of Joel. Now in the dark and alone she is crying without any management of it, which she almost never allows herself, which her body has apparently decided it is owed.</p>
+
+        <span class="voice-line">I'm going to tell you things and I need you to just listen. Can you just listen for a little while?</span>
+
+        <p>She signs — she always signs — <em>I'm listening. I'm right here. I'm always listening.</em></p>
+
+        <span class="voice-line">I was twenty-nine when I died. I know you know this but I want to say it: twenty-nine. I had so much planned. I had you, and you were the best thing I had ever done, and I also had a whole life that I hadn't started yet. And then I died and it was — </span>
+
+        <p>A pause. Three seconds of pure static and then back:</p>
+
+        <span class="voice-line">— it was the most unfair thing I had ever experienced. I was so angry. I am so sorry you got caught in that anger. I am so sorry I stayed. I should have — no, wait, I don't mean that, I don't mean I should have left you, I mean I should have been more careful about whose life I was living while I stayed.</span>
+
+        <span class="voice-line">The flowers were mine. I'm not sorry about the flowers — you love them, I can feel that you love them, it was the right thing. But I should have let you find them yourself. I should have let you come to them on your own time, in your own way. I kept — <span class="static-text">——</span> stepping in front of your choices before you could make them. And you let me because you trusted me and because you loved me and because you were seven when I died and I was all you had and I stayed, and I should have — </span>
+
+        <span class="voice-line">I should have let you miss me more.</span>
+
+        <p>Mara puts both hands over her face. The sound she is making in her chest — she can feel it, all of it, the full and undignified weight of twenty-one years of not-quite-grief finally moving through her all at once — is enormous and she does not try to stop it. There is no one to hear it. The city sleeps. Joel sleeps. The voice is here for a few more minutes and then it will not be, and she is going to be entirely, unmanageably herself for those few minutes and there is nothing else she knows how to do.</p>
+
+        <span class="voice-line">Baby. Look at the bay window. I need you to look at it.</span>
+
+        <p>Mara lifts her head. She looks at the window. The streetlight comes through it in the specific way it has always come through it, the warm pooled light on the floor that she sits in every morning, that she has been told every morning is extraordinary.</p>
+
+        <span class="voice-line">That window is for you. I didn't choose it for me. I know it seemed like I did — I know I said the words — but that window has your light in it, not mine. You woke up every morning in this flat and the light came through that window and you thought: this is good. That thought was yours. It was always yours. I only told you to look.</span>
+
+        <p>Mara is shaking. She signs: <em>I know. I know it was mine. I think I've always known. I just needed you to still be here.</em></p>
+
+        <span class="voice-line">I know, love. I know.</span>
+
+        <span class="voice-line">Now. Last things. I have some last things.</span>
+
+        <span class="voice-line">Your father's name was Daniel. He was kind. You have his laugh and his eyes and his stubbornness, which was the best thing about him and also the worst. He's not dead — last I could tell, he's somewhere in the north, and you don't have to find him, but you can, and you might want to, and I should have told you this twenty years ago.</span>
+
+        <span class="voice-line">Joel is the right one. I know I said this before. I'm saying it again because I want the last thing I say about it to be confirmation: he is the right one. Not because I'm telling you. Because you already know. You've always already known. I just couldn't stop saying it because I liked being right.</span>
+
+        <p>A sound escapes Mara that is half a sob and half a <span class="laugh">laugh — entirely her mother, that entirely her mother,</span> still self-congratulatory at the end of everything.</p>
+
+        <span class="voice-line">There's one more thing. The shop — Renwick Road — the owner is thinking of selling. Priya told you last week and you didn't think about it, I don't know why. Buy it. I know that sounds insane, I know you don't have that kind of money, but you could, if you tried, if you let people help you. Buy the shop and run it yourself. Not for me. For you. You love it the way I always hoped I would love something. I never got to find out what that felt like. You already know.</span>
+
+        <span class="voice-line"><span class="static-text">—ara—</span> I'm going to go now. I don't — <span class="static-text">———</span> I don't want to. I need you to know I don't want to, that leaving is the — <span class="static-text">——</span> the hardest — </span>
+
+        <span class="voice-line"><span class="static-text">———————</span></span>
+
+        <span class="voice-line">You are the best thing that ever happened to me. Before you were born and every day after. You are the best thing. <span class="static-text">——</span> Everything I did that was wrong, I did it because I loved you. You can be angry at me for it. You should be. And I love you. Both of those things are true and <span class="static-text">———</span> always will be.</span>
+
+        <span class="voice-line">Mara.</span>
+
+        <span class="voice-line"><span class="whisper">Mara.</span></span>
+
+        <span class="voice-line"><span class="whisper" style="font-size:0.75em;">I love y—</span></span>
+
+        <span class="silence-block">· · · · · · · · · · · · · · · · · · · · ·</span>
+        <span class="silence-block" style="letter-spacing: 0.7em; opacity: 0.35;">s i l e n c e</span>
+        <span class="silence-block" style="opacity: 0.18;">· · · · · · · · · · · · · · · · · · · · ·</span>
+
+        <p>The bay window holds the streetlight on the floor.</p>
+        <p>The city breathes, outside, unhurried.</p>
+        <p>Mara sits in the chair and the silence is absolute and complete and the most devastating thing she has ever experienced and also, underneath the devastation, quietly and terribly — her own. For the first time in twenty-one years, the silence is entirely, only hers.</p>
+        <p>She sits in it for a long time.</p>
+        <p>She does not sign anything into the air. There is nothing to sign at. There is nothing to receive.</p>
+        <p>The clock on the wall says three forty-one in the morning when she finally gets up. She goes to the bedroom. She stands in the doorway and looks at Joel sleeping — solid, present, real, warm — and she goes to him and she wakes him, gently, and when he opens his eyes and looks at her with the slightly worried look that he has never not had when she wakes him in the night, she signs:</p>
+        <p><em>I have something to tell you. Everything. I need to tell you everything. Can you be awake?</em></p>
+        <p>He sits up. He turns on the lamp. He reaches for her hand and holds it and he signs back: <em>I'm here. Take your time.</em></p>
+        <p>She looks at him. The light from the lamp. His face in it, open and patient and hers.</p>
+        <p>She begins.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VII — Epilogue ── -->
+    <section class="chapter chapter-epilogue" id="ch7">
+      <div class="ch-head">
+        <span class="ch-day">Three Weeks Later</span>
+        <span class="ch-num">Chapter VII</span>
+        <h2 class="ch-title">After</h2>
+        <p class="ch-epigraph">"The silence was not nothing.<br>It was the shape of her, exactly her size, where the voice used to be.<br>Mara learned to carry it like that."</p>
+      </div>
+      <div class="prose">
+        <p>The shop is called Diane's. Not the old name — Mara changed it on the first day, which is either an act of grieving or an act of continuation and she has decided it is probably both and has made peace with that. The sign went up on a Thursday morning in January, in the same cold winter light that had been coming through the bay window every morning since October, and Mara stood outside on the pavement and looked at it for a long time before going in.</p>
+        <p>The buying of the shop was, as predicted, insane. Joel sorted the financing, methodically and without being asked twice, which is exactly who he is. Priya agreed to stay on, which Mara had counted on but not said out loud. Nadia came to the opening and sat in the corner with tea and said nothing for the first hour and then said: <em>She would have been embarrassingly proud of you.</em></p>
+        <p>Mara had laughed. <span class="laugh">Embarrassingly, specifically — yes, exactly, that was right.</span></p>
+        <p>The silence has been — she wants to be accurate about this — the hardest thing she has ever done. Not dramatic, not the screaming devastation she'd feared. Just a constant, textured quiet where the voice used to be, the shape of it still present the way a person's shape remains on a pillow. She has cried about this. She has not cried about it enough, she thinks — grief, she is discovering, is not a thing you can rush, and she has been rushing it, and she has decided to stop rushing it, and to trust that it will move through her in its own time, which is what Nadia told her and which she is trying to believe.</p>
+        <p>She wrote to Daniel. Her father. His address took three weeks to find and another week for her to look at without putting it in a drawer, and when she finally wrote the letter she wrote it by hand, slowly, in the particular focused way that she does things when they matter. She does not know what will happen. She only knows she has his laugh and his eyes and his stubbornness, and those things are hers now to know, and she is glad she knows them.</p>
+
+        <span class="thought">I think about her every day. I think about her more, if anything, now that she's gone — now that the presence has become an absence I have to do something with rather than a presence I can just live beside. I think about the twenty-one years and I do not regret them. I am sometimes angry. I am sometimes more grateful than I can bear. Usually both. This seems right.</span>
+
+        <p>On a Sunday afternoon in late January, three weeks and two days after the voice went quiet, Mara is in the shop after closing, rearranging the white flowers she loves most, and the silence is exactly its ordinary size and she is moving through it with the careful attention of someone who is learning their way around a new room —</p>
+        <p>When she hears something.</p>
+        <p>Not her mother's voice. Not any voice she has heard before. A voice she has never heard — and yet, in the way of the voices the dead send through, somehow already half-known, already specific, already marked with the particular texture of a person she has met and touched and held and knows the shape of completely.</p>
+        <p>She goes very still.</p>
+        <p>The white flowers are in her hands. The shop is closed. The January light through the window is thin and clean and going quickly.</p>
+
+        <span class="voice-line" style="color: var(--col-breaking); border-left-color: var(--col-breaking);">Mara. <span class="static-text">——</span> Mara, it's — I don't understand what — <span class="static-text">———</span> there was an accident and I don't — I can hear you. I can hear you, I don't understand, I don't know where I —</span>
+
+        <p>The voice is new. The voice is frightened. The voice is the voice of someone who has just crossed over and does not understand what has happened and has found, in the first terrible disorientation of that crossing, the person who could hear them.</p>
+        <p>Mara knows this voice.</p>
+        <p>She has heard it every morning for four years.</p>
+        <p>The flowers fall from her hands. She does not notice. She is already moving — to the door, to her phone, to the message thread that says three hours ago: <em>leaving work now, home in 20, want anything?</em> — and she has not replied, she had not replied because she was in the shop, she never replied, and the three hours between that message and right now are the three hours she does not yet know the shape of, that she will learn the shape of in the next ten minutes, that will reorder everything.</p>
+        <p>She calls his phone. It rings to voicemail. His voice on the voicemail, recorded, ordinary, alive: <em>hey, it's Joel, leave a message—</em></p>
+        <p>She presses her back against the cold glass of the door.</p>
+        <p>The new voice comes again — clearer now, learning already how to find her, the way they all learn:</p>
+
+        <span class="voice-line" style="color: var(--col-breaking); border-left-color: var(--col-breaking);">Mara. <span class="static-text">——</span> I think something — I think something happened. <span class="static-text">——</span> Can you hear me? Tell me you can hear me.</span>
+
+        <p>She can hear him.</p>
+        <p>She has always been the one who can hear them.</p>
+        <p>She slides down the cold glass until she is sitting on the floor of her mother's shop, among the fallen white flowers, in the January light, and she holds her phone and she listens to the new voice learning her frequency, and the silence that has been hers for three weeks is no longer hers alone, and the world is unrecognisable and entirely still, and she thinks:</p>
+
+        <span class="thought">I have to learn to reach him. I have to find a way to let him know I can hear him. I have to — Nadia. Nadia will know if it's possible, if there's a way through — twenty-one years and my mother never heard a word I said, but that was her, that was how she was built, and Joel — Joel is different, Joel found me somehow, Joel — </span>
+
+        <span class="thought">He found me. He already found me. In whatever is on the other side of everything he found me first.</span>
+
+        <p>She gets up. She is covered in white petals. She does not wipe them off.</p>
+        <p>She pushes out the door of Diane's florist shop into the January cold, and she takes one breath of the freezing air, and then she starts walking — fast, then faster, toward Clemence Street, toward Nadia, toward the only person who will know what to do next.</p>
+        <p>Behind her, the door swings shut in the January wind. Above it, the new sign.</p>
+        <p><em>Diane's.</em></p>
+        <p>The light holds for one more moment and then the city takes it back, the way the city always does, indifferent to everything beneath it, and the shop is dark and empty and full of white flowers, and somewhere in a frequency that has no name and no coordinates, a man who crossed over three hours ago is still saying a name — her name, only her name, over and over, across whatever is between them now.</p>
+        <p>She can hear him.</p>
+        <p>She is already running.</p>
+        <div class="ch-end">— to be continued —</div>
+      </div>
+    </section>
+
+  </article>
+</div>
+
+<footer>The Shelf &nbsp;·&nbsp; A Private Library</footer>
+
+<script>
+  const root = document.documentElement;
+  const applyTheme = t => {
+    root.setAttribute('data-theme', t);
+    localStorage.setItem('shelf-theme', t);
+    document.querySelectorAll('.theme-opt').forEach(o => o.classList.toggle('active', o.dataset.t === t));
+  };
+  applyTheme(localStorage.getItem('shelf-theme') || 'light');
+  document.querySelectorAll('.theme-opt').forEach(o => o.addEventListener('click', () => applyTheme(o.dataset.t)));
+
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('overlay');
+  const openD   = () => { drawer.classList.add('open');  overlay.classList.add('open'); };
+  const closeD  = () => { drawer.classList.remove('open'); overlay.classList.remove('open'); };
+  document.getElementById('settings-btn').addEventListener('click', openD);
+  document.getElementById('drawer-close').addEventListener('click', closeD);
+  overlay.addEventListener('click', closeD);
+
+  const allProse = document.querySelectorAll('.prose');
+  let fs = parseFloat(localStorage.getItem('shelf-fontsize') || '20');
+  const setFs = v => {
+    fs = Math.min(28, Math.max(16, v));
+    allProse.forEach(p => p.style.setProperty('--fs', fs + 'px'));
+    localStorage.setItem('shelf-fontsize', fs);
+  };
+  setFs(fs);
+  document.getElementById('font-up').addEventListener('click', () => setFs(fs + 1.5));
+  document.getElementById('font-down').addEventListener('click', () => setFs(fs - 1.5));
+
+  const fill = document.getElementById('reading-bar-fill');
+  window.addEventListener('scroll', () => {
+    const pct = Math.min(100, (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+    fill.style.width = pct + '%';
+    const prog = JSON.parse(localStorage.getItem('shelf-progress') || '{}');
+    prog['novels/static.html'] = Math.round(pct);
+    localStorage.setItem('shelf-progress', JSON.stringify(prog));
+  }, { passive: true });
+
+  const chapters = document.querySelectorAll('.chapter');
+  const tocLinks = document.querySelectorAll('.toc a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.toc a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-25% 0px -65% 0px' });
+  chapters.forEach(c => obs.observe(c));
+</script>
+</body>
+</html>
