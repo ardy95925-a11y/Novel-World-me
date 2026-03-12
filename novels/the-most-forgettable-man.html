@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>The Most Forgettable Man in the Known Universe — The Shelf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    [data-theme="light"] {
+      --bg: #f7f3ed; --surface: #eee8dc; --ink: #1a1612; --prose-ink: #2a2218;
+      --muted: #7a6f62; --rule: #ddd6c8; --accent: #5c3d2e; --tag-bg: #e4ddd0;
+      --nav-bg: rgba(247,243,237,0.94); --hero-bg: #0c0b10; --hero-ink: #e8e0d0;
+    }
+    [data-theme="dark"] {
+      --bg: #0f0e0a; --surface: #1a1813; --ink: #e4ddd0; --prose-ink: #cfc8bb;
+      --muted: #6e6455; --rule: #282318; --accent: #bf8f55; --tag-bg: #201e18;
+      --nav-bg: rgba(15,14,10,0.94); --hero-bg: #07060b; --hero-ink: #e8e0d0;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--ink); font-family: 'EB Garamond', Georgia, serif; -webkit-font-smoothing: antialiased; transition: background 0.3s, color 0.3s; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; transition: background 0.3s, border-color 0.3s; }
+    .nav-back { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 7px; transition: color 0.15s; }
+    .nav-back::before { content: '←'; font-family: Georgia, serif; font-size: 13px; letter-spacing: 0; }
+    .nav-back:hover { color: var(--accent); }
+    .nav-center { position: absolute; left: 50%; transform: translateX(-50%); font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); white-space: nowrap; pointer-events: none; }
+    .nav-right { display: flex; align-items: center; gap: 4px; }
+    .icon-btn { width: 34px; height: 34px; border: none; background: none; border-radius: 7px; cursor: pointer; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: background 0.15s, color 0.15s; }
+    .icon-btn:hover { background: var(--surface); color: var(--ink); }
+    .icon-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+    .reading-bar { position: fixed; top: 52px; left: 0; right: 0; z-index: 99; height: 2px; }
+    .reading-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.1s linear; }
+    .overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .settings-drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 201; width: 280px; background: var(--bg); border-left: 1px solid var(--rule); transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), background 0.3s, border-color 0.3s; }
+    .settings-drawer.open { transform: translateX(0); }
+    .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--rule); }
+    .drawer-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+    .drawer-body { padding: 28px 20px; display: flex; flex-direction: column; gap: 28px; }
+    .setting-row > .s-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 14px; }
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .theme-opt { border: 1px solid var(--rule); border-radius: 8px; padding: 12px 10px 10px; cursor: pointer; background: var(--surface); display: flex; flex-direction: column; gap: 8px; transition: border-color 0.15s; }
+    .theme-opt:hover { border-color: var(--muted); }
+    .theme-opt.active { border-color: var(--accent); }
+    .swatch { width: 100%; height: 30px; border-radius: 4px; border: 1px solid var(--rule); }
+    .swatch.light { background: #f7f3ed; } .swatch.dark { background: #0f0e0a; }
+    .theme-opt span { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-align: center; }
+    .font-row { display: flex; gap: 8px; }
+    .font-sz-btn { flex: 1; border: 1px solid var(--rule); background: var(--surface); border-radius: 7px; padding: 10px; cursor: pointer; font-family: 'EB Garamond', serif; color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 15px; transition: border-color 0.15s, background 0.15s; }
+    .font-sz-btn:hover { border-color: var(--accent); background: var(--tag-bg); }
+    .hero { background: var(--hero-bg); padding: 100px 28px 64px; text-align: center; position: relative; overflow: hidden; transition: background 0.3s; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 60% 40%, rgba(60,40,100,0.2) 0%, transparent 65%), radial-gradient(ellipse at 30% 70%, rgba(100,60,20,0.12) 0%, transparent 60%); pointer-events: none; }
+    .hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,185,154,0.15), transparent); }
+    .hero-eye { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(200,185,154,0.45); margin-bottom: 18px; display: block; }
+    .hero-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 4.5vw, 50px); line-height: 1.1; color: var(--hero-ink); margin-bottom: 12px; }
+    .hero-sub { font-family: 'EB Garamond', serif; font-style: italic; font-size: 17px; color: rgba(200,185,154,0.4); }
+    .layout { display: grid; grid-template-columns: 200px 1fr; max-width: 1000px; margin: 0 auto; padding: 0 28px; gap: 64px; align-items: start; }
+    .toc { position: sticky; top: 72px; padding: 48px 0; }
+    .toc-lbl { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 20px; }
+    .toc ul { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+    .toc a { font-family: 'EB Garamond', serif; font-size: 14.5px; color: var(--muted); text-decoration: none; padding: 7px 10px; display: block; border-left: 1px solid transparent; transition: color 0.2s, border-color 0.2s; line-height: 1.4; }
+    .toc a:hover, .toc a.active { color: var(--accent); border-left-color: var(--accent); }
+    .reading { padding: 56px 0 100px; }
+    .chapter { margin-bottom: 72px; }
+    .ch-head { margin-bottom: 40px; padding-bottom: 28px; border-bottom: 1px solid var(--rule); }
+    .ch-num { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 10px; }
+    .ch-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 34px; line-height: 1.12; color: var(--ink); }
+    .ch-epigraph { margin-top: 18px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 17px; color: var(--muted); padding-left: 20px; border-left: 2px solid var(--rule); line-height: 1.6; }
+    .prose { --fs: 20px; font-family: 'EB Garamond', Georgia, serif; font-size: var(--fs); line-height: 1.86; color: var(--prose-ink); }
+    .prose p { margin-bottom: 1.45em; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    .prose p + p { text-indent: 1.4em; }
+    .prose p:first-of-type { text-indent: 0; }
+    .prose p:first-of-type::first-letter { font-family: 'Cormorant Garamond', serif; font-size: 4.4em; font-weight: 300; line-height: 0.8; float: left; margin-right: 0.08em; margin-top: 0.06em; color: var(--accent); }
+    .prose em { font-style: italic; }
+    .prose strong { font-weight: 500; }
+    .scene-break { text-align: center; color: var(--muted); letter-spacing: 0.5em; font-size: 13px; margin: 2.2em 0; user-select: none; }
+    .letter-block { margin: 1.8em 0; padding: 20px 28px; border: 1px solid var(--rule); background: var(--surface); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.96em; line-height: 1.75; color: var(--muted); }
+    .letter-block p { text-indent: 0 !important; margin-bottom: 0.7em; }
+    .letter-block p:last-child { margin-bottom: 0; }
+    .letter-block .letter-head { font-family: 'Cinzel', serif; font-style: normal; font-size: 0.7em; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; display: block; }
+    .ch-end { text-align: center; color: var(--muted); font-family: 'Cormorant Garamond', serif; font-size: 18px; margin-top: 48px; opacity: 0.5; }
+    footer { text-align: center; padding: 28px; font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--rule); border-top: 1px solid var(--rule); }
+    @media (max-width: 720px) { nav { padding: 0 18px; } .nav-center { display: none; } .hero { padding: 88px 20px 52px; } .layout { grid-template-columns: 1fr; padding: 0 18px; gap: 0; } .toc { display: none; } .reading { padding: 36px 0 72px; } .settings-drawer { width: 100%; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="../index.html">Library</a>
+  <span class="nav-center">The Most Forgettable Man</span>
+  <div class="nav-right">
+    <button class="icon-btn" id="settings-btn" aria-label="Settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="reading-bar"><div class="reading-bar-fill" id="reading-bar-fill"></div></div>
+<div class="overlay" id="overlay"></div>
+
+<div class="settings-drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="drawer-label">Settings</span>
+    <button class="icon-btn" id="drawer-close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="setting-row">
+      <span class="s-label">Theme</span>
+      <div class="theme-grid">
+        <div class="theme-opt active" data-t="light"><div class="swatch light"></div><span>Light</span></div>
+        <div class="theme-opt" data-t="dark"><div class="swatch dark"></div><span>Dark</span></div>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="s-label">Text Size</span>
+      <div class="font-row">
+        <button class="font-sz-btn" id="font-down">A−</button>
+        <button class="font-sz-btn" id="font-up">A+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <span class="hero-eye">Comedy · Cosmic Horror · A Bureaucratic Nightmare</span>
+  <h1 class="hero-title">The Most Forgettable Man<br>in the Known Universe<br><em style="font-size:0.7em; opacity:0.6">(And Several Adjacent Ones)</em></h1>
+  <p class="hero-sub">A Story of Gerald. Poor, Unremarkable, Doomed Gerald.</p>
+</div>
+
+<div class="layout">
+  <aside class="toc">
+    <span class="toc-lbl">Contents</span>
+    <ul>
+      <li><a href="#ch1" class="active">I — The Letter</a></li>
+      <li><a href="#ch2">II — The Apartment Situation</a></li>
+      <li><a href="#ch3">III — Phillip from HR</a></li>
+      <li><a href="#ch4">IV — The Support Group</a></li>
+      <li><a href="#ch5">V — Several Very Bad Ideas</a></li>
+      <li><a href="#ch6">VI — The Conference of Forgotten Things</a></li>
+      <li><a href="#ch7">VII — Gerald's Villain Arc</a></li>
+      <li><a href="#ch8">VIII — The Strongly-Worded Email</a></li>
+      <li><a href="#ch9">IX — Gerald, Remembered</a></li>
+    </ul>
+  </aside>
+
+  <article class="reading">
+
+    <!-- ── Chapter I ── -->
+    <section class="chapter" id="ch1">
+      <div class="ch-head">
+        <span class="ch-num">Chapter I</span>
+        <h2 class="ch-title">The Letter</h2>
+        <p class="ch-epigraph">"Every great story begins with someone's life being ruined.<br>Gerald's began on a Tuesday, which felt about right."</p>
+      </div>
+      <div class="prose">
+        <p>Gerald Fitch had, by any reasonable measure, a completely fine life. Not good, not bad — fine. The kind of fine that sits in the middle of a survey and makes statisticians sigh. He worked in data entry at a firm that processed insurance claims for other firms that processed insurance claims, which was the corporate equivalent of a dream dying very slowly over nineteen years. He had a flat with a leaky radiator he had named Dennis. He owned three plants, two of which were alive. His hobby was watching documentaries about places he would never go, which he called "travelling." Everything about Gerald was the precise temperature of lukewarm.</p>
+        <p>On the morning this story becomes unavoidably his problem, Gerald woke up, made toast, and found a letter under his door.</p>
+        <p>This was unusual. Gerald never got letters. Gerald barely got emails. His own mother communicated with him primarily through forwarded chain messages about God protecting him from misfortune, which suggested she considered the arrangement optional.</p>
+        <p>The envelope was cream-coloured and heavier than it should have been, as though the paper had strong opinions. There was no stamp. There was no return address. There was, in the top-left corner, a small embossed symbol that appeared to be an eye, a filing cabinet, and a question mark, all inexplicably merged into one logo, above the words:</p>
+
+        <div class="letter-block">
+          <span class="letter-head">The Cosmic Administration of Existential Records — Division of Notable Persons</span>
+          <p>Dear Mr. Gerald Alan Fitch,</p>
+          <p>Congratulations! Following our annual review of all 108 billion human beings who have ever lived, your file has been selected for a special designation.</p>
+          <p>Effective immediately, you have been classified as <em>The Most Forgettable Person in the Known Universe (and Several Adjacent Ones)</em>. This is not an insult. It is an administrative category, like "deceased" or "pending."</p>
+          <p>As a consequence of this designation, reality has begun the process of gently deprioritising your existence. You may notice that people forget you mid-conversation, that doors stop recognising you, that your coffee order is wrong 100% of the time regardless of what you say, and that on three occasions this week a pigeon has flown directly through you.</p>
+          <p>This is normal. Please do not be alarmed.</p>
+          <p>If you wish to contest this designation, please visit our offices at your earliest convenience. We are located between a dry cleaner's and the gap between seconds. Bring a form of identification. We will have forgotten it is required by the time you arrive, but it's the principle.</p>
+          <p>Yours administratively,</p>
+          <p><em>Phillip</em><br>Senior Clerk, Division of Notable Persons<br>P.S. We have already forgotten we sent this. Good luck.</p>
+        </div>
+
+        <p>Gerald read the letter twice. Then he read it a third time, because his brain kept autocorrecting the words into something that made more sense, and he had to keep catching it doing this and forcing it to stop.</p>
+        <p>He looked up from the letter. He looked around his kitchen. Everything appeared normal. Dennis the radiator was doing his usual impression of a dying whale. The two surviving plants looked fine. The dead one looked fine too, frankly, which had always been slightly insulting.</p>
+        <p>His phone buzzed. It was his mother. The message read: <em>Have a blessed day sweetheart, God is watching over you</em>, followed by seventeen prayer-hands emojis, which Gerald's phone inexplicably rendered as seventeen small pictures of a pigeon.</p>
+        <p>Gerald sat down and ate his toast.</p>
+        <p>The toast tasted of nothing, which it had never done before. He checked the butter. The butter had been replaced, at some point he could not identify, by a substance that was butter-shaped but committed to no particular flavour. The label on the side said <em>Margarine</em>, which Gerald was almost certain was not what he had bought, but he could not remember buying anything at all, which, now that he thought about it, was the point.</p>
+        <p>He was being erased.</p>
+        <p>He was being erased and the process had given him margarine.</p>
+        <p>Gerald decided, with the quiet determination of a man who had spent nineteen years in data entry and therefore had a very high tolerance for meaningless suffering, that he was going to do something about this.</p>
+        <p>He put on his coat. He picked up the letter. He looked at the address — <em>between a dry cleaner's and the gap between seconds</em> — and thought: well, he knew where the dry cleaner's was, at least. That was a start. That was, in Gerald's experience, how most things began: with a start that was technically progress even if it wasn't much of one.</p>
+        <p>He left his flat.</p>
+        <p>The door did not acknowledge him on his way out. He took this personally, which the letter had said was normal, but which did not make it less personally taken.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter II ── -->
+    <section class="chapter" id="ch2">
+      <div class="ch-head">
+        <span class="ch-num">Chapter II</span>
+        <h2 class="ch-title">The Apartment Situation</h2>
+        <p class="ch-epigraph">"The problem with being forgotten by reality<br>is that reality does not apologise about it."</p>
+      </div>
+      <div class="prose">
+        <p>The Cosmic Administration of Existential Records was, Gerald discovered after forty minutes of walking in the wrong direction, located in a narrow passage between the Kwik Kleen dry cleaner's and a wall that appeared to have been there for some time but which Gerald had walked past every day for six years without ever noticing. This was, in retrospect, a clue he could have acted on sooner.</p>
+        <p>The door was very small. Not a child-sized door or a hobbit-sized door — just slightly smaller than a door had any right to be, as though it had been designed to make everyone who entered it feel faintly ridiculous. Above it, in small brass letters, were the words <strong>DEPARTMENT OF EXISTENTIAL RECORDS — PLEASE TAKE A NUMBER.</strong></p>
+        <p>Gerald took a number. The number was 7,841,003.</p>
+        <p>The screen above the desk said <strong>NOW SERVING: 4.</strong></p>
+        <p>Gerald sat down.</p>
+        <p>The waiting room was a masterclass in the specific misery of official spaces everywhere. The chairs were the kind designed by someone who hated sitting. There was a plant in the corner that was so fake it had given up trying to look real and was now just a philosophical gesture toward the concept of plants. A poster on the wall said <strong>YOUR EXISTENCE MATTERS TO US</strong> in a font that communicated the opposite. Beneath it, someone had written in biro: <em>no it doesn't, Phillip lied, I've been here since 2003, send help, my name was Derek.</em></p>
+        <p>Gerald looked at the other people waiting. There was a woman in a business suit who was visibly flickering at the edges, like a badly buffered video. There was a man who, every time Gerald looked directly at him, seemed to have been replaced by a slightly different man — same suit, slightly different face, never exactly the man Gerald had just been looking at. There was a child, alone, eating a crisp with the quiet calm of someone fully at peace with eternity.</p>
+        <p>Gerald considered asking how long they'd been waiting. He decided against it on the grounds that he didn't want to know the answer.</p>
+        <p>Two hours passed.</p>
+        <p>During this time, Gerald attempted to read a magazine from the table. The magazine was called <em>Relevant Existence Quarterly</em> and appeared to be targeted at people who still existed in a robust and satisfying way, which made it feel like a personal attack. The lead article was titled <em>Ten Ways to Make Your Presence Felt</em>. Gerald put it back.</p>
+        <p>The screen changed. Slowly. Agonisingly.</p>
+        <p><strong>NOW SERVING: 5.</strong></p>
+        <p>The flickering woman made a sound.</p>
+        <p>"I know," said the child with the crisp, without looking up.</p>
+        <div class="scene-break">· · ·</div>
+        <p>Gerald's number was called at approximately four in the afternoon, at which point the waiting room was empty except for him and the child, who appeared to have settled in as a permanent fixture and was now on their second bag of crisps and a colouring book.</p>
+        <p>"Seven million, eight hundred and forty-one thousand and three?" said the clerk behind the desk.</p>
+        <p>"That's me," said Gerald.</p>
+        <p>The clerk looked at him. The clerk had the face of someone who had been processing cosmic administrative errors for so long that individual human misery had become, to them, a purely numerical phenomenon. He was wearing a name badge that said <strong>PHILLIP</strong>. He had the energy of a man who had sent several thousand letters informing people their existence was being deprecated and had stopped finding this remarkable around the forty-year mark.</p>
+        <p>"Name?" said Phillip.</p>
+        <p>"Gerald Fitch. I got a letter—"</p>
+        <p>"I'll need you to spell that."</p>
+        <p>"Gerald. G-E-R-A-L-D."</p>
+        <p>Phillip typed something. He looked at the screen. He typed something else. He frowned in the specific way of someone whose computer has told them something they don't want to deal with.</p>
+        <p>"Right," said Phillip. "So. You've been designated Most Forgettable, our records show. Congratulations."</p>
+        <p>"You said that in the letter."</p>
+        <p>"Did I?" Phillip looked genuinely uncertain. "I don't remember sending a letter."</p>
+        <p>"You wrote 'P.S. We have already forgotten we sent this' in the letter."</p>
+        <p>"That does sound like something I'd write," Phillip conceded. "Anyway. You're here to contest the designation?"</p>
+        <p>"Yes."</p>
+        <p>"Right." Phillip pulled a form from beneath the desk. It was thirty-seven pages long. "You'll need to fill this in. Section A is your personal details. Section B is your notable achievements. Section C is the achievements of anyone who remembers you."</p>
+        <p>Gerald looked at Section C. It was completely blank. Not a single line. Not even a heading, just an expanse of white paper and, at the bottom, a small printed message that said: <em>If this section is empty, you may leave it empty. We understand. We're sorry. (We won't remember being sorry, but we are, right now, in this moment, briefly sorry.)</em></p>
+        <p>"What happens if I don't contest it?" Gerald asked.</p>
+        <p>Phillip appeared to consider whether to answer this honestly. He appeared to decide that honesty was, at this stage, the path of least administrative resistance.</p>
+        <p>"You finish fading," Phillip said. "Progressively. Over approximately six weeks. By the end, you'll be walking through walls, which sounds fun but is mostly just a fire hazard. Then you'll technically still exist but in a purely theoretical sense. We file you under the T's. Theoretical."</p>
+        <p>"The T's."</p>
+        <p>"Big cabinet. Mostly philosophers, a few politicians. You'd be in good company, arguably."</p>
+        <p>Gerald picked up the pen. He looked at Section B. Notable achievements.</p>
+        <p>He thought about this for a very long time.</p>
+        <p>He wrote: <em>I have kept a plant alive for four years. Her name is Margot. She is doing well.</em></p>
+        <p>He stared at this for a moment and then, because he was Gerald and he had never once in his life overstated his case, added: <em>The other two are less well. I am working on it.</em></p>
+        <p>He slid the form back across the desk.</p>
+        <p>Phillip looked at it. Something moved in his face — not quite an expression, more the ghost of one, the idea that an expression had passed through on its way somewhere else. He stamped the form. The stamp said <strong>RECEIVED — DO NOT LOSE</strong>, which Gerald felt was probably aspirational given the circumstances.</p>
+        <p>"We'll be in touch," Phillip said.</p>
+        <p>"When?"</p>
+        <p>"When we remember to be. Try not to fade in the meantime." He paused. "Try to be more memorable. Do something. Anything. Eat a strange food. Learn a skill. Talk to someone. The designation feeds on insignificance, if you want the technical explanation."</p>
+        <p>"So you're telling me the cure for being the most forgettable person in the universe is to be less forgettable."</p>
+        <p>"Essentially, yes."</p>
+        <p>"That's the worst advice I've ever received."</p>
+        <p>"Well," said Phillip, with the air of a man who had said this sentence many, many times, "at least now you'll remember you received it."</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter III ── -->
+    <section class="chapter" id="ch3">
+      <div class="ch-head">
+        <span class="ch-num">Chapter III</span>
+        <h2 class="ch-title">Phillip from HR</h2>
+        <p class="ch-epigraph">"Gerald had been told to make himself memorable.<br>He had interpreted this, reasonably, as a death sentence dressed up as homework."</p>
+      </div>
+      <div class="prose">
+        <p>Gerald spent the evening attempting to be memorable and discovering that this was significantly harder than the word implied.</p>
+        <p>He tried cooking something unusual. He made a curry that the recipe described as "adventurous," which turned out to be code for "inedible," which he ate anyway, half out of stubbornness and half because his fridge currently contained three items, one of which was the margarine that had replaced his butter without explanation and one of which was a yoghurt that had expired in a month Gerald was fairly certain had not happened yet.</p>
+        <p>He tried learning a skill. He watched a forty-minute tutorial on how to juggle and learned, primarily, that juggling required a spatial awareness he had never been issued with. He threw one of the oranges. It went sideways, hit Dennis the radiator, and Dennis made a sound of profound structural suffering.</p>
+        <p>"Sorry," Gerald told Dennis.</p>
+        <p>Dennis dripped, which was his version of a shrug.</p>
+        <p>He tried talking to someone. He called his colleague Marcus at work, who picked up, said "oh hi Greg," and then spent eleven minutes telling Gerald about a problem he was having with his car without once asking how Gerald was or apparently registering that he had called Gerald by the wrong name. Gerald, who had been working with Marcus for seven years, said "it's Gerald, actually," and Marcus said "yeah," in the tone of a man who had stored this information directly into the bin.</p>
+        <p>Gerald hung up and looked at his hands. They were slightly transparent at the edges. Not alarmingly so. Just enough.</p>
+        <p>He decided to go to bed and approach the problem fresh in the morning, which was what Gerald always decided when problems were too large to solve in the evening. His entire adult life had been built on this system. It had not, historically, solved the problems, but it had gotten him through the evenings, which he had come to understand was its actual purpose.</p>
+        <div class="scene-break">· · ·</div>
+        <p>In the morning, Phillip was sitting in Gerald's kitchen.</p>
+        <p>Not in the sense that Gerald had let him in. Phillip was simply there, in the chair Gerald used when he ate cereal, with a mug of tea that he appeared to have made himself using Gerald's kettle, wearing the same grey suit from yesterday, with his name badge on.</p>
+        <p>"How did you get in?" Gerald said.</p>
+        <p>"The door forgot to keep you out," Phillip said. "It gets confused. It used to remember you specifically but now it just lets everyone through as a kind of hedge. I find it easier than knocking."</p>
+        <p>"I have a lock."</p>
+        <p>"The lock is having a similar issue, yes."</p>
+        <p>Gerald sat down across from Phillip. Phillip offered him the other mug of tea, which he had also apparently made, which meant he had made tea for both of them in Gerald's kitchen before Gerald was awake, which was deeply presumptuous and also, Gerald had to admit, quite considerate.</p>
+        <p>"I'm not supposed to do this," Phillip said, "but I feel slightly bad about the letter. I feel slightly bad about all the letters. It's hard to maintain that I don't, for administrative reasons, but in practice I do."</p>
+        <p>"Right," Gerald said.</p>
+        <p>"The thing is," Phillip said, wrapping both hands around his mug, "the designation isn't irreversible. I told you to be more memorable, which is technically correct but unhelpful, like telling someone with a broken leg to walk it off. What I should tell you is that the designation was triggered by an event, and if you trace it back to the event and undo it, the whole thing unravels."</p>
+        <p>"What event?"</p>
+        <p>Phillip looked at his notes. He had notes, in a small notebook he had produced from somewhere. "Seven years ago," he said. "You made a decision. A very specific decision. You were going to leave your job — had the resignation letter written and everything — and then you didn't. You put the letter in the drawer and went back to your desk and that was that. The system flagged it as the moment you chose, definitively, the version of yourself that would not leave a mark."</p>
+        <p>Gerald stared at him.</p>
+        <p>"You're saying the universe is punishing me for not quitting my job."</p>
+        <p>"The universe isn't punishing you. The universe is categorising you. It's different. The universe doesn't have feelings about it."</p>
+        <p>"What was I going to do? When I quit?"</p>
+        <p>Phillip checked his notes. "Open a restaurant."</p>
+        <p>A silence fell. Gerald thought about the curry from last night, which had been genuinely terrible, and felt a complex cascade of emotions that eventually settled into something between relief and grief.</p>
+        <p>"I can't cook," he said.</p>
+        <p>"It wasn't going to be a good restaurant," Phillip said. "Our projections had it closing in about fourteen months. But it was going to be <em>yours.</em> You were going to fail at something real. That's what the system looks for — people who are willing to genuinely, publicly, embarrassingly try. The designation can't touch someone who is trying, even badly."</p>
+        <p>"So all I have to do to stop fading out of existence is make a catastrophic life decision."</p>
+        <p>"You could frame it more positively."</p>
+        <p>"How?"</p>
+        <p>Phillip thought about this for a moment. "You could say you're being given a second chance to fail at something meaningful," he said. "That's the most positive framing I've got. I work in cosmic administration, not motivational speaking."</p>
+        <p>Gerald drank his tea. It was good tea, which was annoying because Phillip had made it with Gerald's things and had not asked, and yet it was better tea than Gerald ever made himself, and this felt like some kind of metaphor that Gerald wasn't ready to sit with.</p>
+        <p>"What if I fail at the restaurant and it still doesn't work?"</p>
+        <p>"Then you try something else. The key is the trying, not the succeeding. The universe," Phillip said, with the tone of a man who had typed this into too many official documents, "does not actually care if you succeed. It cares if you showed up."</p>
+        <p>He stood, picked up his notebook, adjusted his name badge, and moved toward Gerald's door.</p>
+        <p>"I'll see myself out," Phillip said.</p>
+        <p>"The door won't remember me being here," Gerald pointed out.</p>
+        <p>"It'll remember <em>me</em>," Phillip said, which was the most quietly devastating thing anyone had ever said to Gerald, and the door opened immediately and let Phillip through without incident, and closed behind him, and Gerald sat alone in his kitchen being slowly erased, drinking surprisingly good tea.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter IV ── -->
+    <section class="chapter" id="ch4">
+      <div class="ch-head">
+        <span class="ch-num">Chapter IV</span>
+        <h2 class="ch-title">The Support Group</h2>
+        <p class="ch-epigraph">"It is a comfort to know one is not alone in one's suffering.<br>It is a less of a comfort when everyone in the room also keeps forgetting you are there."</p>
+      </div>
+      <div class="prose">
+        <p>Phillip had, before leaving, slid a leaflet under Gerald's nose. The leaflet was for a support group called <strong>Existentially Compromised Anonymous</strong>, which met on Thursday evenings in the back room of a pub called The Anchor, or possibly The Other Anchor — the leaflet was smudged and Gerald could only make out that it was definitely an anchor.</p>
+        <p>Gerald went. He was not a support-group sort of person. He was barely a going-out-on-a-Thursday sort of person. But his hands were now transparent up to the first knuckle, which he had been covering with his sleeves all day, and two people at work had sat down in his chair while he was still in it, and a bus had driven through his left foot, which hadn't hurt exactly but had given him a very bad afternoon.</p>
+        <p>The back room of The Other Anchor contained seven people sitting in a circle of mismatched chairs, with the particular energy of a group that had been through enough together to have gotten past small talk and arrived at the quiet despair on the other side of it.</p>
+        <p>Gerald took a seat. A man across the circle looked at him, looked away, then looked back with the expression of someone who had the strong impression they had forgotten to do something.</p>
+        <p>"New person," said a woman to his left. She had the brisk manner of someone who ran things. "I'm Donna. I facilitate. I've also been partially unremembered for about sixteen months, which gives me some authority here. What's yours?"</p>
+        <p>"Gerald. Two weeks. I got the letter."</p>
+        <p>A sympathetic noise ran through the group, in the way that a particular flavour of bad news earns a particular flavour of sympathy from people who have tasted the same thing.</p>
+        <p>"Phillip's letter?" said a man named Greg, who had no eyebrows and explained this was because reality had simply stopped generating them, apparently considering them non-essential.</p>
+        <p>"Yes. With the logo that looks like an eye having an administrative crisis."</p>
+        <p>"That's the one," said Greg. "He sent me mine three months ago. I've been in the process of fading ever since. Currently I'm about sixty percent remembered at any given time, which means I exist fully only about three days a week and spend the other four as a kind of ambient presence that makes people feel like they've left the oven on."</p>
+        <p>Next to Greg was a woman named Sandra who was completely invisible but was still attending, she explained, because she found the meetings helpful even if no one could see her and had to be reminded she was there by the chair. The chair had a small sign on it that said <strong>SANDRA IS SITTING HERE.</strong></p>
+        <p>"Hello Sandra," said Gerald.</p>
+        <p>"Hello," said an empty chair.</p>
+        <p>There was a man named Kenneth, who was present but whose name no one could retain for longer than approximately forty-five seconds, so Donna had written it on his forehead in marker and everyone periodically glanced at it mid-conversation. Kenneth had accepted this with the resignation of a man who had tried everything else. His forehead said <strong>KENNETH</strong> in neat capitals and also, because they'd had to re-do it once, <strong>STILL KENNETH</strong> just below.</p>
+        <p>There was a teenager named Priya who had been designated Not Worth Noticing rather than Forgettable, which was technically a different department but Phillip had told her this group was the closest thing available, and who spent most of the meeting on her phone because the group kept forgetting to include her in the conversation.</p>
+        <p>There was an elderly man at the back who appeared to be fully present and memorable and not fading in any way, and when Gerald pointed this out, the group explained that he wasn't part of the support group, he was simply a man called Dennis who came to this pub every Thursday and had been sitting in the back room for eleven years, and they had all gradually become too used to him to ask him to move. Dennis raised his pint in acknowledgement and said nothing.</p>
+        <p>Donna opened the meeting properly. "Let's go around," she said. "Updates since last week. Anything new. Greg, you first."</p>
+        <p>"My cat has forgotten me," Greg said. "Which is particularly bad because I am allergic to cats and bought him as a challenge to be memorable to something, and now he keeps sitting on my face in the night because he's forgotten I'm a person and thinks I'm just a warm surface."</p>
+        <p>"Progress," said Donna encouragingly.</p>
+        <p>"He's sitting on my face," Greg repeated.</p>
+        <p>"He's interacting with you. That's something."</p>
+        <p>Sandra updated that she had managed to order a coffee successfully for the first time in six weeks, by writing her order on a piece of paper and placing it firmly on the counter, and the barista had made it before forgetting who it was for, which meant Sandra had managed to intercept it during the brief window of ambiguity, which the group agreed was a significant tactical victory.</p>
+        <p>Kenneth began speaking and two sentences in the group started looking at each other with that vague searching look that meant they had lost the thread of who was talking. Kenneth pointed at his forehead. "STILL KENNETH," he said, firmly. The group re-found him. He continued.</p>
+        <p>Gerald, when his turn came, explained the situation. The restaurant. The resignation letter in the drawer. The seven years of doing nothing at all with a life that had been ready to do something. He did not know why he told them all of this so easily — maybe it was that none of them would remember it — but the words came out more honestly than he had said anything in a long time, and the group listened with the focused attention of people who knew very precisely what it felt like to not be listened to.</p>
+        <p>When he finished, Donna said: "You still have the letter? The resignation one?"</p>
+        <p>"In my desk drawer. I know it's still there."</p>
+        <p>"Then you know what you have to do."</p>
+        <p>"I know what the cosmic administration thinks I have to do," Gerald said. "It's a different thing."</p>
+        <p>"Is it?"</p>
+        <p>Gerald thought about this. Across the circle, Dennis raised his pint again, apparently offering a toast to something, though what exactly was not clear.</p>
+        <p>"He does that," Donna said. "We don't know what he's toasting. We've decided it's us."</p>
+        <p>"To being forgotten," said Greg.</p>
+        <p>"To still showing up anyway," said Donna.</p>
+        <p>The empty chair that was Sandra made a small sound that might have been agreement.</p>
+        <p>Gerald raised his own glass. His hand was transparent enough now that the light came through it slightly, which would have been alarming an hour ago and now, in this particular room with these particular people, was simply a fact about his hand.</p>
+        <p>"To still showing up," he said.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter V ── -->
+    <section class="chapter" id="ch5">
+      <div class="ch-head">
+        <span class="ch-num">Chapter V</span>
+        <h2 class="ch-title">Several Very Bad Ideas</h2>
+        <p class="ch-epigraph">"Gerald's plan had the key quality shared by all great plans:<br>he had not yet understood how wrong it was going to go."</p>
+      </div>
+      <div class="prose">
+        <p>Gerald did not go straight home and hand in his resignation letter. He was not built for straight lines. He was built for the kind of path that finds every possible route before eventually arriving at the obvious destination via a prolonged detour through several intermediate mistakes, each of which felt, from the inside, like a reasonable attempt at the correct answer.</p>
+        <p>First, he tried to become memorable through social media. He made an account on six different platforms and posted a series of updates about his life in an attempt to anchor his existence in the digital record. The posts were viewed by a combined total of four people, one of whom was a bot, one of whom had clicked on him by mistake while trying to follow their cousin, and two of whom were Priya from the support group who had found him by accident and followed him out of what she described, in a comment, as "solidarity and mild pity."</p>
+        <p>Three days after he made the accounts, the platforms had all independently forgotten his passwords, deleted his profile photos, and in one case reclassified his account as a test environment and populated it with placeholder content about a fictional insurance salesman named Gary.</p>
+        <p>Gerald looked at Gary's posts for a while. Gary had a much more interesting life than Gerald. Gary had been to Lisbon.</p>
+        <p>Second, Gerald attempted to become memorable through public gesture. He went to the park near his flat and tried to feed the ducks, which he had heard was a soothing activity, and discovered that the ducks had also been affected by the designation — not that the ducks forgot him specifically, ducks not being generally known for their long-term retention of individual humans, but that reality had apparently begun quietly reassigning Gerald's causal footprint, so that every time he threw bread in the direction of a duck, the bread arrived at the duck's location having apparently come from no one in particular, which the ducks found completely normal but which Gerald found deeply sad.</p>
+        <p>He fed the ducks for forty-five minutes. Not one duck looked at him.</p>
+        <p>"Brilliant," said a man passing by, looking at the ducks crowding the water's edge. "Loads of them today."</p>
+        <p>"I've been feeding them for forty-five minutes," Gerald said.</p>
+        <p>The man looked at Gerald with the polite uncertainty of someone who has heard a sound and can't locate its source. "Is someone there?" he said, and walked on.</p>
+        <p>Third, and with the diminishing confidence of a person who is down to their last reasonable options, Gerald decided to attempt the restaurant directly. Not to open one — not yet — but to at least take a step in that direction. He booked himself onto a beginner cookery class at a place called Simone's Kitchen Experience, which promised <em>a welcoming environment for all levels</em> and had a photo on the website of people laughing while holding spatulas, which Gerald found implausible but hopeful.</p>
+        <div class="scene-break">· · ·</div>
+        <p>The class was eight people and an instructor named Derek who had the energy of a man who had chosen this career because he loved food and had since discovered that teaching beginners to cook was a different activity than loving food, in the same way that loving children is a different activity than teaching thirty of them to do long division.</p>
+        <p>Gerald was paired with a woman named Clare, who was sharp and funny and made the most consistently disastrous food Gerald had ever seen with a cheerfulness that suggested she viewed cooking as performance art rather than nourishment. Her sauce was wrong in a way Derek could not scientifically account for. Her pastry had somehow achieved the consistency of a decision. She folded this into a small parcel and handed it to Gerald to taste and Gerald ate it because he had been raised to eat what was put in front of him, and it tasted absolutely fine.</p>
+        <p>"It tastes fine," he said, surprised.</p>
+        <p>"It looks like something from a crime scene," she said, squinting at the remaining pastry.</p>
+        <p>"It genuinely tastes completely fine."</p>
+        <p>Clare looked at him with the focused attention of someone who has just been told something useful. "You can taste things properly? Like, you have functioning taste buds?"</p>
+        <p>"I think so."</p>
+        <p>"I'm completely taste-blind. I've been cooking by texture for thirty years and everyone's been very polite about it." She considered this. "So if something tastes fine to you it's probably fine to anyone. You're like a control group."</p>
+        <p>"I've never been a control group before."</p>
+        <p>"I could use a control group," she said, in the tone of someone filing a useful thing away. "I'm opening a restaurant."</p>
+        <p>Gerald stared at her. Of all the sentences he had expected to hear, across all the possible things a person could say to him in a beginner cookery class, <em>I'm opening a restaurant</em> had not appeared on any of the lists.</p>
+        <p>"I'm opening one too," he said. Which was not strictly true. But it was, he felt, closer to true than it had been twenty minutes ago. Something in the room had shifted — in the specific way that things shift when a coincidence is too pointed to be a coincidence and has the distinct quality of a plot.</p>
+        <p>"When?" said Clare.</p>
+        <p>"Soon," Gerald said. "Imminently. When I hand in my resignation letter."</p>
+        <p>"You have a resignation letter written already?"</p>
+        <p>"For seven years."</p>
+        <p>Clare looked at him. Then she said something that no one had said to Gerald in approximately seven years, and possibly longer, and which landed on him with the specific weight of a thing that has been absent so long its presence is momentarily incomprehensible.</p>
+        <p>"I think you should actually do that," she said. Directly, seriously, as though the sentence were obvious and he simply hadn't been told it yet.</p>
+        <p>Derek burned something at the front of the class. The smoke alarm went off. Everyone moved toward the exit in the good-natured confusion of an organised emergency, and in the shuffle Gerald was jostled and bumped and completely noticed by six different people, one of whom apologised for stepping on his foot, and the foot was fully solid and completely stepped on and it hurt, which was, of all the things that had happened to Gerald in recent weeks, the best news he'd had.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VI ── -->
+    <section class="chapter" id="ch6">
+      <div class="ch-head">
+        <span class="ch-num">Chapter VI</span>
+        <h2 class="ch-title">The Conference of Forgotten Things</h2>
+        <p class="ch-epigraph">"The thing about being forgotten is that you are still, annoyingly, there.<br>You do not disappear. You simply become the universe's unsolved admin."</p>
+      </div>
+      <div class="prose">
+        <p>Gerald woke up at 3 a.m. to find his flat full of things that had also been forgotten.</p>
+        <p>This was not, Phillip would later explain, unusual for someone at Gerald's level of the designation. When a person was being progressively erased, the forgotten things in their vicinity — objects, memories, abandoned plans, minor supernatural entities left behind by previous tenants — tended to congregate around the erasure event like moths around a lamp, or more accurately like people who have also been left out of things gathering near someone else who has also been left out of things, for the company.</p>
+        <p>Gerald's flat now contained the following forgotten things, arranged with a lack of self-consciousness that suggested they had been there a while:</p>
+        <p>A children's television show from 1987 that everyone vaguely remembered existing but no one could name, manifested as a short repeating loop of brightly coloured animation playing in the corner near Dennis. Two socks — not from pairs that had been separated but from pairs that had never existed on either end, orphan socks with no origin story, sitting on the kitchen table with the quiet dignity of the genuinely unexplained. A Tuesday from 2014 that Gerald apparently hadn't fully experienced at the time and which was still sitting there, half-processed, looking mildly offended about it. A phone number for a woman named Elaine, written on a Post-it note, which had been lost so thoroughly and for so long that it had developed a personality and was now sitting on the windowsill looking quietly resigned. And an announcement — not a person or an object, just an announcement, the kind that gets made in train stations and supermarkets and then immediately forgotten — that kept repeating, every twelve minutes or so, in a slightly echoey voice: <em>"Attention please, your attention please, could the owner of a — "</em> and then stopping.</p>
+        <p>Gerald sat in the middle of all of this in his dressing gown and considered his options.</p>
+        <p>"Right," he said, to the room.</p>
+        <p>The room did not respond. The announcement said <em>your attention please</em> and stopped. The 1987 television show played its twelve seconds of animation. The Tuesday looked at him.</p>
+        <p>"You're all here because I'm being erased," Gerald said. "And if I get un-erased, you presumably go back to wherever you came from."</p>
+        <p>The orphan socks appeared to consider this.</p>
+        <p>"So it's in everyone's interest for me to sort this out."</p>
+        <p>The Post-it note with Elaine's number fluttered, which Gerald chose to interpret as agreement.</p>
+        <p>"I'm going to hand in the letter," Gerald told his flat full of cosmic lost property. "In the morning. I'm going to hand in the letter and I'm going to open a restaurant with Clare and it's going to be terrible and then it's going to be slightly less terrible, and I'm going to make the universe remember me by being publicly and enthusiastically bad at something real until I get better at it, or don't, but either way I'll have tried, and apparently that's the whole thing."</p>
+        <p>Silence. Then Dennis the radiator made his whale noise, which Gerald had always interpreted as complaint but which he now chose to interpret as encouragement, because context was everything and he needed all the encouragement he could get.</p>
+        <p>"Thank you Dennis."</p>
+        <p>Dennis dripped.</p>
+        <p>The Tuesday from 2014, apparently satisfied, began to resolve itself slowly, the way forgotten things do when someone has acknowledged them — not dramatically, not with fanfare, just a gradual fading that was nothing like Gerald's fading, that had warmth in it rather than erasure, the fading of something being put back rather than taken away. One by one the forgotten things in Gerald's flat began the same process, slowly, quietly, until at some point before dawn the room was empty again except for Gerald and Dennis and Margot the surviving plant and the two plants of indeterminate mortality.</p>
+        <p>Gerald looked at Margot.</p>
+        <p>"You've been doing very well," he told her.</p>
+        <p>Margot continued to exist, which was all he'd ever asked of her.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VII ── -->
+    <section class="chapter" id="ch7">
+      <div class="ch-head">
+        <span class="ch-num">Chapter VII</span>
+        <h2 class="ch-title">Gerald's Villain Arc</h2>
+        <p class="ch-epigraph">"Every person, at least once, deserves to stand in an office<br>and say something they have been not-saying for seven years."</p>
+      </div>
+      <div class="prose">
+        <p>The resignation letter, when Gerald retrieved it from the back of his desk drawer on Friday morning, was still there. He had half expected it to have faded, to have been lost in the same cosmic displacement that had taken his butter and the Tuesday, but it was intact — slightly wrinkled, the print a little smudged from seven years in a drawer between a takeaway menu and a charger for a phone he no longer owned. He read it standing over the open drawer, still in his coat, still with his bag on, and it was not bad. It was, in fact, rather good. It was the best thing he had written in years, possibly because he had written it at a moment when he actually meant something.</p>
+        <p>He went to his manager's office. His manager's name was Keith. Keith was the kind of manager who managed things by sending emails about meetings in which he would discuss the email he had sent about the meeting. Keith had a motivational poster on his wall that said <strong>TEAMWORK MAKES THE DREAM WORK</strong>, which Gerald had been looking at for seven years and which he had recently begun to interpret as a threat.</p>
+        <p>"Keith," Gerald said, from the doorway.</p>
+        <p>Keith looked up. Keith was already looking slightly through Gerald rather than at him, which was the designation at work, the edges of Gerald's presence in the room beginning to blur. Gerald stepped fully in, closed the door, and stood in front of Keith's desk with the specific energy of a man who has made a decision and is not allowing himself to un-make it.</p>
+        <p>"I'm resigning," Gerald said. He put the letter on the desk. "That's my letter. Four weeks' notice. I've enjoyed—" he paused, because he had not actually enjoyed it, or rather he had enjoyed specific small things in it and found the general enterprise of the last seven years deeply numbing, and he felt that honesty was probably the move here. "I've found it fine," he said. "It's been fine. Thank you for the fine time."</p>
+        <p>Keith looked at the letter. Keith looked at Gerald. Keith looked at the letter again with the expression of someone whose Monday has just become more complicated than it had any right to be at nine fifteen in the morning.</p>
+        <p>"Gerald," Keith said.</p>
+        <p>"Yes."</p>
+        <p>"Is this—" Keith seemed to search for the right framing. "Is this about the quarterly review? Because we can discuss the quarterly review—"</p>
+        <p>"It's not about the quarterly review."</p>
+        <p>"The Pembridge account? Because I know the Pembridge thing was—"</p>
+        <p>"It's not about Pembridge." Gerald took a breath. "Keith, I am being progressively erased from existence by a cosmic administrative body because I have spent the better part of a decade being not quite present in my own life, and the only way to reverse this is to commit, genuinely, to something that matters to me, which is not this job. With respect. And some residual affection, actually, which is real, I'm not being sarcastic. I've spent a lot of my life in this office and the people here are fine and I wish them well. But I'm opening a restaurant."</p>
+        <p>Keith looked at him for a long time.</p>
+        <p>"You can't cook," Keith said.</p>
+        <p>"I know."</p>
+        <p>"You burned toast in the kitchen last March and we had to evacuate the floor."</p>
+        <p>"I know. The restaurant is going to be terrible. That's broadly the point." Gerald picked up his bag. "Four weeks, Keith. Then I'm gone."</p>
+        <p>He left Keith's office. He walked back to his desk, and he sat down, and Marcus in the adjacent pod looked over and said "morning Gerald," and then — for the first time, for the actual first time in recent memory — looked straight at Gerald and said: "You alright? You look different."</p>
+        <p>"I handed in my notice," Gerald said.</p>
+        <p>"Oh," Marcus said. He appeared to process this. Then, slowly, something moved in his expression — something that might have been, over a long enough baseline, a form of respect. "Good for you, mate."</p>
+        <p>"Thank you, Marcus."</p>
+        <p>"I always forget your name," Marcus said. "I don't know why, you sit right there."</p>
+        <p>"It's been a thing. It's getting better."</p>
+        <p>Gerald looked down at his hands. His hands were solid. Completely, fully, unremarkably solid, the colour of hands, the temperature of hands, casting a small and permanent shadow on the desk in a way they hadn't done in weeks. He made a fist. Opened it. The hand remained entirely, stubbornly, satisfyingly <em>there.</em></p>
+        <p>The universe, apparently, had noticed.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VIII ── -->
+    <section class="chapter" id="ch8">
+      <div class="ch-head">
+        <span class="ch-num">Chapter VIII</span>
+        <h2 class="ch-title">The Strongly-Worded Email</h2>
+        <p class="ch-epigraph">"Gerald had contested the designation. He had done so, for the record,<br>by becoming someone who would contest a designation. This is, cosmically speaking, the only way it ever works."</p>
+      </div>
+      <div class="prose">
+        <p>Three days later, Gerald received an email.</p>
+        <p>It was from phillip@cosmic-existential-records.gov (an email address that his spam filter categorised, with surprising accuracy, under <em>Suspicious But Possibly Legitimate</em>), and it read:</p>
+
+        <div class="letter-block">
+          <span class="letter-head">Re: Designation Review — Fitch, Gerald Alan — Case #7,841,003</span>
+          <p>Dear Mr. Fitch,</p>
+          <p>Further to your recent actions, your case has been reviewed by the Division of Notable Persons. Following a thorough assessment of your decision to tender your resignation and pursue an independent catering venture despite having no discernible culinary aptitude, your designation has been revised.</p>
+          <p>You are no longer classified as <em>Most Forgettable Person in the Known Universe.</em></p>
+          <p>You are now classified as <em>Notably Determined Despite Everything</em>, which is a Category B designation with no negative consequences and one or two quite pleasant ones, including but not limited to: doors will remember you, people will retain your name for the standard duration, and the municipal pigeon population will no longer perceive you as a permeable surface.</p>
+          <p>Your file has been moved from the F cabinet (Forgettable) to the N cabinet (Notable). You may find this meaningless, as a material change. Administratively, it is significant. You have our formal acknowledgement that you exist, and that your existence is, on balance, the sort of existence the universe would prefer to keep.</p>
+          <p>We wish you well with the restaurant. Our projections suggest it will close in fourteen months. We mean this in the most encouraging possible way.</p>
+          <p>Yours administratively,</p>
+          <p><em>Phillip</em><br>Senior Clerk<br>P.S. The Tuesday from 2014 has been fully reintegrated. If you are wondering why you suddenly remember having a particularly good sandwich on a Tuesday afternoon seven years ago, that is why. You are welcome.</p>
+        </div>
+
+        <p>Gerald read this at his desk, in his last week before the four-week notice period began — Keith had agreed to let him go early, having spent the interim period in a state of confused goodwill that suggested the universe was already updating his impression of Gerald in real-time. He read it twice. Then he forwarded it to Clare, who had, in the week since the cookery class, become a fixture in his life in the specific way that useful people become fixtures when you have spent a long time not having useful people in your life: quickly, practically, and without a great deal of ceremony.</p>
+        <p>Her reply came back in forty seconds: <em>lmao the projections say 14 months. challenge accepted. also I found a space. come see it Saturday??</em></p>
+        <p>Gerald replied: <em>yes</em></p>
+        <p>He put his phone down. He looked at the data entry on his screen, the rows and rows of insurance claim numbers that he had been entering for nineteen years, and he felt — not dramatically, not with strings — a simple and clear and very quiet sense of an ending. Not a bad ending. Just a completion. The kind of ending that an overlong chapter needs before the next one can start.</p>
+        <p>He typed three more entries.</p>
+        <p>He made himself a cup of tea in the office kitchen and drank it looking out the window at the street, where people were going past in the ordinary urgent way of people going about their days, everyone visible to everyone, everyone remembered, everyone sufficiently solid to walk through the world without the world walking through them. He was one of them now. He was a person in a window with a cup of tea, which was not remarkable, and was also, for Gerald, who had spent several weeks being progressively subtracted from existence, absolutely enough.</p>
+        <p>He went back to his desk. He entered seven more claims. He wrote a note to Marcus telling him the good coffee was in the second drawer, not the third. He left the note where Marcus would find it.</p>
+        <p>Marcus looked up ten minutes later. "Oi, Gerald," he said, "did you know there's good coffee in the second drawer?"</p>
+        <p>"Just found out," Gerald said.</p>
+        <p>"Legend," said Marcus. He made himself a cup. "You're going to be missed, you know. When you go."</p>
+        <p>Gerald looked at him. Marcus looked back, with the vague slightly-surprised expression of someone saying something they've only just discovered they mean. The office was warm and slightly too bright and smelled of the good coffee, and Gerald was entirely solid in his chair, and Marcus knew his name on the first try, and in the corner of the room the fern that nobody watered but that somehow refused to die was doing exactly what it had always done, and none of this was remarkable and all of it was entirely, straightforwardly fine.</p>
+        <p>"Thanks Marcus," Gerald said.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter IX ── -->
+    <section class="chapter" id="ch9">
+      <div class="ch-head">
+        <span class="ch-num">Chapter IX</span>
+        <h2 class="ch-title">Gerald, Remembered</h2>
+        <p class="ch-epigraph">"The restaurant closed in eleven months, which was three months ahead of the universe's projection,<br>and Gerald considered this a personal victory."</p>
+      </div>
+      <div class="prose">
+        <p>The restaurant was called Margot's, after the plant, because Clare had said "you should name it after something you love" and Gerald had looked around his life for a while and landed on the plant, which Clare had found both very sad and very right. Margot the plant was moved to the restaurant on opening day and given pride of place near the window, where she thrived even more aggressively than she had in the flat, which Gerald found personally meaningful and botanically baffling.</p>
+        <p>The restaurant was, as projected, not good.</p>
+        <p>It was also not without its qualities. Clare's food looked like what you'd find if you asked a very enthusiastic child to describe a meal from memory and then built it from scratch, but tasted — once Gerald had been through each dish in their testing sessions and reported back on what was actually happening in the flavour — completely fine, and often better than fine, and occasionally something that Clare would make by accident and Gerald would taste and say "do that again, exactly like that" and Clare would squint at her notes and say "I think I used the wrong amount of everything and also forgot to add the thing."</p>
+        <p>The reviews were interesting. Not good. But interesting. One reviewer wrote: <em>The food at Margot's is technically flawed in ways I found strangely comforting, like being cooked for by a very loving person who is not sure what they're doing.</em> Clare printed this and put it on the wall. It was the best review they got for four months, and they treated it like a Michelin star.</p>
+        <p>The support group came to the soft launch. Greg brought his cat, who immediately forgot it was supposed to be on Gerald's lap and sat on a chair of its own, which Derek from the cookery class — who had also come — said was the most well-behaved cat he'd ever seen at a restaurant opening. Sandra was also there, and Gerald had arranged a small card on her chair that said <strong>RESERVED — SANDRA</strong>, which she described afterward, to Donna, as the nicest thing anyone had done for her in seventeen months. Kenneth was there too, and after the third time the waiter forgot his name, Clare had taken a piece of tape and put it on the back of his menu: <strong>KENNETH, TABLE 4, HE'S BEEN HERE THE WHOLE TIME.</strong> Kenneth had laughed for the first time in months. Real laughter, the kind that requires being fully present in a room.</p>
+        <p>Phillip showed up at half past eight, without a reservation, in his grey suit with his name badge on. Gerald sat him at the bar and made him a cup of tea, because Phillip seemed like a tea person, and brought over the dish Clare was most proud of, which was a thing that had started as a pasta and become something else through a sequence of decisions that could not be retraced but which tasted extraordinary.</p>
+        <p>Phillip ate it with the careful attention of someone who did not eat out often.</p>
+        <p>"This is very good," Phillip said.</p>
+        <p>"Don't tell Clare that. She'll try to replicate it and it'll never be the same."</p>
+        <p>"Does it matter?"</p>
+        <p>Gerald thought about this. "No," he said. "I suppose the next one will just be different."</p>
+        <p>Phillip nodded. He looked around the restaurant — the full tables and the slightly wrong lighting and Margot in the window and Kenneth laughing and Sandra's empty chair that was not empty and the 1987 television show that had, for reasons neither Gerald nor Clare could explain, started playing on a loop on the small TV above the bar, its twelve seconds of bright animation cycling cheerfully through the evening — and he had the look of someone completing a piece of administrative work they had, despite themselves, found satisfying.</p>
+        <p>"You've been removed from the F cabinet," Phillip said. "Formally. There's a small ceremony, usually. We forgot to invite you."</p>
+        <p>"I assumed."</p>
+        <p>"The N cabinet is quite full, I should warn you. You'll be filed between a Norwegian mountaineer and a woman from Osaka who invented a new type of knot. Notable company."</p>
+        <p>"I'll manage," Gerald said.</p>
+        <div class="scene-break">· · ·</div>
+        <p>The restaurant closed in eleven months, as mentioned. This was for a combination of reasons: the lease ran out and the new terms were unaffordable; Clare had gotten a better offer from a catering company that wanted her specific talent for food that looked chaotic but tasted fine; and Gerald had, over the course of eleven months, discovered that what he was actually good at — really good at, the specific thing he'd been trying to find for nineteen years — was not cooking, but the very particular skill of noticing when something tasted right.</p>
+        <p>He became a food consultant. Not a reviewer, not a chef, but the person you called when you needed someone to sit in a restaurant and eat everything and tell you, honestly and without agenda, what was actually working. He was, it turned out, extraordinarily good at this. He had spent his whole life being present without being noticed, attending without performing, absorbing without broadcasting — and these were, it turned out, not failures of character but the specific qualities of an excellent palate. He tasted things clearly because he had no other way of tasting them. He saw what was actually there because he had never learned to see what he expected to be there instead.</p>
+        <p>He kept the plant. He got a second one to replace the ones that hadn't survived, and that one also thrived, which Donna from the support group said was a sign that he was putting out the right energy, and which Gerald said was probably just a sign that he'd gotten better at watering.</p>
+        <p>He called his mother and she answered on the first ring and said "Gerald!" with the specific delight of a person hearing a name they are glad to hear, and they talked for an hour, which was the longest they had talked in years, and his mother did not forward him a single chain message about God's protection, which Gerald chose to interpret as a vote of confidence in his ability to protect himself, and which it might have been.</p>
+        <p>He and Clare started a second venture together — a small catering operation, more manageable, still slightly chaotic, still producing food that looked wrong and tasted right, which had become, among their small and growing client list, something of a known quality. The operation did not have a name for the first month, and when Clare said they needed one, Gerald thought about it for a long time and said: "What about <em>Still Here?"</em></p>
+        <p>Clare said it sounded like a pub. Gerald said maybe that was fine. Clare said it was fine. They put it on the van.</p>
+        <p>The van was a very bad van with an intermittent horn issue that honked at random during quiet streets, which people remembered, and which the traffic warden remembered, and which two separate journalists mentioned in pieces about the catering company, one of them describing the van as "memorably, unavoidably alive."</p>
+        <p>Gerald read that and put the article on the wall next to Clare's review from the restaurant.</p>
+        <p>Dennis the radiator, in his new flat — Gerald had moved in February, to somewhere without a leaky radiator, and had named the new radiator Dennis II out of respect for continuity — made no noise at all, because he was a functional radiator that had never needed a name. Gerald named him anyway.</p>
+        <p>And in a filing cabinet in a narrow office between a dry cleaner's and the gap between seconds, a new file sat in the N drawer: <strong>FITCH, GERALD ALAN — NOTABLY DETERMINED DESPITE EVERYTHING.</strong> The file was thick and getting thicker, which was how the N drawer worked — it kept accumulating, kept growing, kept requiring new paper, because the people in it had that particular quality of generating more of themselves the longer they existed, the quality of lives that had committed to being lived and therefore kept producing material.</p>
+        <p>Phillip filed the latest addition — a newspaper clipping about the van, the honking, the slightly wrong food, the growing reputation — and closed the drawer.</p>
+        <p>He sat at his desk. He made himself a cup of tea. He looked at the stack of letters waiting to be sent — new letters, new designations, new people about to have a very confusing Tuesday.</p>
+        <p>He thought, briefly, about Gerald, eating something in the back of a van on a cold morning and reporting back to Clare that it was fine, actually, it tasted fine, the thing she'd thought was ruined was completely fine.</p>
+        <p>He thought: there are worse things to be remembered for.</p>
+        <p>He picked up the next letter. He addressed the envelope. He posted it through the gap in time that served as an outbox, and it was gone, and somewhere in the world another person was about to have a very unusual morning, and the filing cabinet was full and getting fuller, and the universe went on categorising everything it contained with the patient thoroughness of a system that had been running since before the first word, that would be running when the last one was forgotten, that had never once — not in all its impossible administrative vastness — filed a person in the wrong place twice.</p>
+        <p>Not on purpose, anyway.</p>
+        <div class="ch-end">✦</div>
+      </div>
+    </section>
+
+  </article>
+</div>
+
+<footer>The Shelf &nbsp;·&nbsp; A Private Library</footer>
+
+<script>
+  const root = document.documentElement;
+  const applyTheme = t => {
+    root.setAttribute('data-theme', t);
+    localStorage.setItem('shelf-theme', t);
+    document.querySelectorAll('.theme-opt').forEach(o => o.classList.toggle('active', o.dataset.t === t));
+  };
+  applyTheme(localStorage.getItem('shelf-theme') || 'light');
+  document.querySelectorAll('.theme-opt').forEach(o => o.addEventListener('click', () => applyTheme(o.dataset.t)));
+
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('overlay');
+  const openD   = () => { drawer.classList.add('open');  overlay.classList.add('open'); };
+  const closeD  = () => { drawer.classList.remove('open'); overlay.classList.remove('open'); };
+  document.getElementById('settings-btn').addEventListener('click', openD);
+  document.getElementById('drawer-close').addEventListener('click', closeD);
+  overlay.addEventListener('click', closeD);
+
+  const allProse = document.querySelectorAll('.prose');
+  let fs = parseFloat(localStorage.getItem('shelf-fontsize') || '20');
+  const setFs = v => {
+    fs = Math.min(28, Math.max(16, v));
+    allProse.forEach(p => p.style.setProperty('--fs', fs + 'px'));
+    localStorage.setItem('shelf-fontsize', fs);
+  };
+  setFs(fs);
+  document.getElementById('font-up').addEventListener('click', () => setFs(fs + 1.5));
+  document.getElementById('font-down').addEventListener('click', () => setFs(fs - 1.5));
+
+  const fill = document.getElementById('reading-bar-fill');
+  window.addEventListener('scroll', () => {
+    const pct = Math.min(100, (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+    fill.style.width = pct + '%';
+    const prog = JSON.parse(localStorage.getItem('shelf-progress') || '{}');
+    prog['novels/the-most-forgettable-man.html'] = Math.round(pct);
+    localStorage.setItem('shelf-progress', JSON.stringify(prog));
+  }, { passive: true });
+
+  const chapters = document.querySelectorAll('.chapter');
+  const tocLinks = document.querySelectorAll('.toc a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.toc a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-25% 0px -65% 0px' });
+  chapters.forEach(c => obs.observe(c));
+</script>
+
+</body>
+</html>
