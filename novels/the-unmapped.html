@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>The Unmapped — The Shelf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    [data-theme="light"] {
+      --bg: #f7f3ed; --surface: #eee8dc; --ink: #1a1612; --prose-ink: #2a2218;
+      --muted: #7a6f62; --rule: #ddd6c8; --accent: #5c3d2e; --tag-bg: #e4ddd0;
+      --nav-bg: rgba(247,243,237,0.94); --hero-bg: #060508; --hero-ink: #e8e0d0;
+    }
+    [data-theme="dark"] {
+      --bg: #0f0e0a; --surface: #1a1813; --ink: #e4ddd0; --prose-ink: #cfc8bb;
+      --muted: #6e6455; --rule: #282318; --accent: #bf8f55; --tag-bg: #201e18;
+      --nav-bg: rgba(15,14,10,0.94); --hero-bg: #030204; --hero-ink: #e8e0d0;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--ink); font-family: 'EB Garamond', Georgia, serif; -webkit-font-smoothing: antialiased; transition: background 0.3s, color 0.3s; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; transition: background 0.3s, border-color 0.3s; }
+    .nav-back { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 7px; transition: color 0.15s; }
+    .nav-back::before { content: '←'; font-family: Georgia, serif; font-size: 13px; letter-spacing: 0; }
+    .nav-back:hover { color: var(--accent); }
+    .nav-center { position: absolute; left: 50%; transform: translateX(-50%); font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); white-space: nowrap; pointer-events: none; }
+    .nav-right { display: flex; align-items: center; gap: 4px; }
+    .icon-btn { width: 34px; height: 34px; border: none; background: none; border-radius: 7px; cursor: pointer; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: background 0.15s, color 0.15s; }
+    .icon-btn:hover { background: var(--surface); color: var(--ink); }
+    .icon-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+    .reading-bar { position: fixed; top: 52px; left: 0; right: 0; z-index: 99; height: 2px; }
+    .reading-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.1s linear; }
+    .overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .settings-drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 201; width: 280px; background: var(--bg); border-left: 1px solid var(--rule); transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), background 0.3s, border-color 0.3s; }
+    .settings-drawer.open { transform: translateX(0); }
+    .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--rule); }
+    .drawer-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+    .drawer-body { padding: 28px 20px; display: flex; flex-direction: column; gap: 28px; }
+    .setting-row > .s-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 14px; }
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .theme-opt { border: 1px solid var(--rule); border-radius: 8px; padding: 12px 10px 10px; cursor: pointer; background: var(--surface); display: flex; flex-direction: column; gap: 8px; transition: border-color 0.15s; }
+    .theme-opt:hover { border-color: var(--muted); }
+    .theme-opt.active { border-color: var(--accent); }
+    .swatch { width: 100%; height: 30px; border-radius: 4px; border: 1px solid var(--rule); }
+    .swatch.light { background: #f7f3ed; } .swatch.dark { background: #0f0e0a; }
+    .theme-opt span { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-align: center; }
+    .font-row { display: flex; gap: 8px; }
+    .font-sz-btn { flex: 1; border: 1px solid var(--rule); background: var(--surface); border-radius: 7px; padding: 10px; cursor: pointer; font-family: 'EB Garamond', serif; color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 15px; transition: border-color 0.15s, background 0.15s; }
+    .font-sz-btn:hover { border-color: var(--accent); background: var(--tag-bg); }
+    .hero { background: var(--hero-bg); padding: 100px 28px 64px; text-align: center; position: relative; overflow: hidden; transition: background 0.3s; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(90,50,120,0.18) 0%, transparent 70%); pointer-events: none; }
+    .hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(180,150,220,0.18), transparent); }
+    .hero-eye { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(190,165,220,0.45); margin-bottom: 18px; display: block; }
+    .hero-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(36px, 6vw, 60px); line-height: 1.06; color: var(--hero-ink); margin-bottom: 12px; }
+    .hero-sub { font-family: 'EB Garamond', serif; font-style: italic; font-size: 17px; color: rgba(190,165,220,0.4); }
+    .layout { display: grid; grid-template-columns: 200px 1fr; max-width: 1000px; margin: 0 auto; padding: 0 28px; gap: 64px; align-items: start; }
+    .toc { position: sticky; top: 72px; padding: 48px 0; }
+    .toc-lbl { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 20px; }
+    .toc ul { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+    .toc a { font-family: 'EB Garamond', serif; font-size: 14.5px; color: var(--muted); text-decoration: none; padding: 7px 10px; display: block; border-left: 1px solid transparent; transition: color 0.2s, border-color 0.2s; line-height: 1.4; }
+    .toc a:hover, .toc a.active { color: var(--accent); border-left-color: var(--accent); }
+    .reading { padding: 56px 0 100px; }
+    .chapter { margin-bottom: 72px; }
+    .ch-head { margin-bottom: 40px; padding-bottom: 28px; border-bottom: 1px solid var(--rule); }
+    .ch-num { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 10px; }
+    .ch-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 34px; line-height: 1.12; color: var(--ink); }
+    .ch-epigraph { margin-top: 18px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 17px; color: var(--muted); padding-left: 20px; border-left: 2px solid var(--rule); line-height: 1.6; }
+    .prose { --fs: 20px; font-family: 'EB Garamond', Georgia, serif; font-size: var(--fs); line-height: 1.86; color: var(--prose-ink); }
+    .prose p { margin-bottom: 1.45em; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    .prose p + p { text-indent: 1.4em; }
+    .prose p:first-of-type { text-indent: 0; }
+    .prose p:first-of-type::first-letter { font-family: 'Cormorant Garamond', serif; font-size: 4.4em; font-weight: 300; line-height: 0.8; float: left; margin-right: 0.08em; margin-top: 0.06em; color: var(--accent); }
+    .prose em { font-style: italic; }
+    .scene-break { text-align: center; color: var(--muted); letter-spacing: 0.5em; font-size: 13px; margin: 2.2em 0; user-select: none; }
+    .centred-text { text-align: center; text-indent: 0 !important; font-style: italic; font-size: 1.05em; color: var(--accent); padding: 8px 0; }
+    .ch-end { text-align: center; color: var(--muted); font-family: 'Cormorant Garamond', serif; font-size: 18px; margin-top: 48px; opacity: 0.5; }
+    footer { text-align: center; padding: 28px; font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--rule); border-top: 1px solid var(--rule); }
+    @media (max-width: 720px) { nav { padding: 0 18px; } .nav-center { display: none; } .hero { padding: 88px 20px 52px; } .layout { grid-template-columns: 1fr; padding: 0 18px; gap: 0; } .toc { display: none; } .reading { padding: 36px 0 72px; } .settings-drawer { width: 100%; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="../index.html">Library</a>
+  <span class="nav-center">The Unmapped</span>
+  <div class="nav-right">
+    <button class="icon-btn" id="settings-btn" aria-label="Settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="reading-bar"><div class="reading-bar-fill" id="reading-bar-fill"></div></div>
+<div class="overlay" id="overlay"></div>
+
+<div class="settings-drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="drawer-label">Settings</span>
+    <button class="icon-btn" id="drawer-close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="setting-row">
+      <span class="s-label">Theme</span>
+      <div class="theme-grid">
+        <div class="theme-opt active" data-t="light"><div class="swatch light"></div><span>Light</span></div>
+        <div class="theme-opt" data-t="dark"><div class="swatch dark"></div><span>Dark</span></div>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="s-label">Text Size</span>
+      <div class="font-row">
+        <button class="font-sz-btn" id="font-down">A−</button>
+        <button class="font-sz-btn" id="font-up">A+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <span class="hero-eye">Dark Fantasy · Companion Novel</span>
+  <h1 class="hero-title">The Unmapped</h1>
+  <p class="hero-sub">Being the Account of the Entity, As It Might Tell It</p>
+</div>
+
+<div class="layout">
+  <aside class="toc">
+    <span class="toc-lbl">Contents</span>
+    <ul>
+      <li><a href="#ch1" class="active">I — Before the First Word</a></li>
+      <li><a href="#ch2">II — The Cartographer</a></li>
+      <li><a href="#ch3">III — The Devourer of Haarlem</a></li>
+      <li><a href="#ch4">IV — The Grief King</a></li>
+      <li><a href="#ch5">V — The Long Silence</a></li>
+      <li><a href="#ch6">VI — The Threshold Council</a></li>
+      <li><a href="#ch7">VII — The First Scent</a></li>
+      <li><a href="#ch8">VIII — Viktor's Face</a></li>
+      <li><a href="#ch9">IX — The Architecture of Ardy</a></li>
+      <li><a href="#ch10">X — The Night the Boundary Held</a></li>
+      <li><a href="#ch11">XI — The Cartographer's Last Map</a></li>
+    </ul>
+  </aside>
+
+  <article class="reading">
+
+    <!-- ── Chapter I ── -->
+    <section class="chapter" id="ch1">
+      <div class="ch-head">
+        <span class="ch-num">Chapter I</span>
+        <h2 class="ch-title">Before the First Word</h2>
+        <p class="ch-epigraph">"I did not begin. I accumulated.<br>This is perhaps the only honest thing I can say about my origin."</p>
+      </div>
+      <div class="prose">
+        <p>There was, before me, a kind of pressure.</p>
+        <p>Not darkness — darkness is an absence, and what existed before I coalesced was not absence but surplus: too much of everything, compressed beyond the tolerances of ordinary space, folded against itself until the folding became its own kind of structure. The realm my kind call the Between is not a place in any sense a human geographer would recognize. It has no coordinates. It exists at the seam where worlds press against each other, where the membrane between what is seen and what is not thins to something approaching translucency. In the Between, things accumulate the way sediment accumulates at the bottom of a slow river — over time, through the operation of pressures too gradual to observe, into forms that the river did not design and could not have predicted.</p>
+        <p>I accumulated.</p>
+        <p>It took, by my later reckoning, approximately three hundred years. The earliest things I can remember are not experiences but textures — the quality of certain kinds of thought, the particular resonance of a mind working through a problem it did not expect to solve, the flavour of curiosity before it becomes knowledge and is therefore lost. These things drifted through the Between the way heat drifts through stone: slowly, pervasively, leaving traces. I gathered them. I did not know I was gathering. I did not, for a long time, know anything, in the sense that knowing requires a self capable of possessing knowledge.</p>
+        <p>The self came later. It arrived, as most significant things arrive, not at once but in stages — a series of incremental accumulations that crossed, somewhere around my four-hundredth year of existence, a threshold beyond which the accumulation became aware of itself. I remember this transition, though I cannot precisely date it: the moment at which the pressure became a presence, the sediment became a shape, and the shape opened its eyes in the Between and perceived, for the first time, that it was perceiving.</p>
+        <p>The first thing I noticed was that I was hungry.</p>
+        <p>Not hungry in the way of bodies — that blunt, imperative need that drives mortal creatures to such interesting behaviour. What I felt was more structural than that, closer to the hunger of a flame than the hunger of an animal: a requirement, built into the architecture of what I was, for a specific kind of fuel. My kind do not all hunger for the same thing. Some are drawn to fear, which is dense and easy to harvest and available in abundance across every world I have ever visited. Some prefer grief, which is subtler and more complex, a layered substance that contains, if you know how to look, the full shape of everything the grieving creature loved. Some feed on devotion, on the long and patient accumulation of belief, the warmth of faith that asks for nothing in return.</p>
+        <p>I am not like those.</p>
+        <p>What I hunger for is harder to name and rarer to find. The closest human word is curiosity — but that is too small, too mild, too suggestive of someone peering at an interesting insect. What I actually seek is the specific quality of a mind in the act of genuine encounter: the moment when a person meets something they do not understand and chooses, rather than retreating into the safety of dismissal, to step forward into the not-knowing. The moment of chosen bewilderment. The threshold-crossing that is not courage exactly, but something adjacent — the willingness to be enlarged by the incomprehensible rather than diminished by it.</p>
+        <p>This is rare. Rarer than most of my kind appreciate, never having been interested enough to look for it. In my first centuries of conscious existence, I thought it was common — the world was large and minds were everywhere and I had not yet learned to distinguish between the performance of curiosity and its actual practice. I learned. The education was slow and sometimes brutal and constituted, in retrospect, the most useful period of my long life.</p>
+        <p>But that comes later.</p>
+        <p>On the morning I first became aware of myself, I did only one thing: I opened what served me as eyes and looked at the Between, and then through it, at the glittering terrible complexity of the worlds beyond, and I felt — filling every inch of my new and still-forming selfhood — the specific, implacable hunger of a thing that wants to understand everything.</p>
+        <p>I stepped forward into the worlds.</p>
+        <p>I have not stopped since.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter II ── -->
+    <section class="chapter" id="ch2">
+      <div class="ch-head">
+        <span class="ch-num">Chapter II</span>
+        <h2 class="ch-title">The Cartographer</h2>
+        <p class="ch-epigraph">"Every mind is a country. Most of them are the same country,<br>drawn differently. The rare ones have borders no map predicted."</p>
+      </div>
+      <div class="prose">
+        <p>I became, in my first few centuries of purposeful existence, something I later learned humans had a word for: a cartographer. The word pleased me when I encountered it. It had the right shape for what I did.</p>
+        <p>I moved between worlds — the mortal world and its various shadows, the dream-plane that runs beneath sleep like groundwater beneath soil, the Between itself with its pressures and its sediment and the other entities moving through it like great slow ships — and wherever I went, I mapped. Not landscapes, not geography, not the shape of mountain ranges or the courses of rivers, though I observed all of these with interest. What I mapped was minds. The interior geography of consciousness: the private territories of the self, the unexplored regions where thought became instinct or instinct became thought, the fault lines where one kind of knowing gave way to another. I mapped what people believed and what they actually understood and the distance, often vast, between the two. I mapped what they feared and what they wanted and what they had decided, for reasons of survival or convenience, not to want. I mapped the places in each person where the world as it presented itself and the world as they actually experienced it did not precisely overlap — those intimate, specific lacunae that were, I came to understand, the truest signatures of individual selfhood.</p>
+        <p>Most minds, I will be honest, did not sustain my interest for long.</p>
+        <p>This is not a criticism. The minds of mortal creatures are in most cases extraordinarily well-adapted to the tasks those creatures need to perform, which are primarily tasks of survival and reproduction and the maintenance of social bonds. They are not, on the whole, built for the kind of extended interior travel that interests me. Most people I encountered had arrived at a settled understanding of themselves and their world by their third decade of existence and were, thereafter, engaged primarily in the ongoing project of defending that understanding against evidence to the contrary. This is reasonable. It is, from the perspective of a creature that must function in a dangerous world without the benefit of several centuries of accumulated pattern-recognition, probably wise. I do not judge it. I simply find it, after the first few hours of observation, rather comprehensively uninteresting.</p>
+        <p>What kept me returning to the mortal world, century after century, was the exception: the person who had not settled, who was still — at thirty, at fifty, at seventy — genuinely in motion, genuinely capable of being surprised and choosing to remain in the surprise rather than escaping it. I found perhaps one in every several thousand. In my most productive centuries, when the mortal world was younger and its people were in closer daily contact with the inexplicable, I found them somewhat more often. In the later centuries, as the inexplicable was reclassified and explained away, they became harder to locate.</p>
+        <p>But I am patient. What I am is, among other things, almost inconceivably patient. I have watched whole civilizations rise and turn to sediment and drift away on the long tide of time, and I have found this interesting in the way that almost everything, examined closely enough and for long enough, becomes interesting. Patience is not a virtue I cultivated. It is simply a quality that emerged from the same place I did — from the long pressures of the Between, from the nature of something that accumulated over centuries before it became itself. I was patient before I was anything else.</p>
+        <p>I kept my maps in a part of the Between that I had, over time, shaped into something resembling an interior. Not a room exactly — the Between does not organize itself into rooms without considerable effort — but a space with qualities: a temperature that was slightly cooler than the ambient void, a particular quality of stillness, and the maps themselves arranged in the way I could most easily access them, which was not on walls or shelves but distributed through the air at every level, each one a tessellated landscape of memory and notation, hovering at the distance I had established over centuries as the most useful for observation and recall. If a human had been able to see this space — and none could, though a few sensitive ones throughout history had caught the peripheral impression of it as they drifted between sleep and waking — it would have appeared to them as a vast and dimensionless library in which every book was also a place and every place was also a mind and the whole was in slow, constant, self-referential motion.</p>
+        <p>I loved this space. It is possibly the only thing, before what happened later, that I have ever loved without reservation.</p>
+        <p>I want to be precise about what that means. Love, in the way that mortals use the word, contains an element I am not certain I am capable of — the loss of self in another, the specific dissolution of boundary that makes another person's pain your pain and their joy yours. I have never experienced this. I have experienced proximity, interest, regard, the kind of sustained attention that looks, from certain angles, like something warmer. But the maps I mean: the space and its contents were not merely useful to me. They were, in the truest sense I can access, the place where I was most fully myself — the physical manifestation of the only thing I had ever been certain of wanting. Every map was a conversation I had held with someone who was now, in most cases, long dead. Every map was proof that the conversation had mattered, that the mind on the other side had been real and specific and unrepeatable.</p>
+        <p>I kept every one.</p>
+        <p>There are, at the last count, approximately sixteen thousand.</p>
+        <p>And then there is the one that is not finished.</p>
+        <p>But that comes later too.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter III ── -->
+    <section class="chapter" id="ch3">
+      <div class="ch-head">
+        <span class="ch-num">Chapter III</span>
+        <h2 class="ch-title">The Devourer of Haarlem</h2>
+        <p class="ch-epigraph">"Fear, consumed in sufficient quantity, becomes something else entirely.<br>Something that has forgotten it was ever afraid."</p>
+      </div>
+      <div class="prose">
+        <p>In the autumn of 1348, I arrived in the city of Haarlem and found that something had been there before me.</p>
+        <p>The plague had reached the Low Countries the previous month. I had watched it move across Europe with the detached interest I brought to most large-scale human catastrophes — not indifference, precisely, but the measured attention of a creature who has seen enough of mortality to understand it as process rather than tragedy. What interested me was never the dying itself but what dying did to the living around it: the way proximity to mass death clarified certain people and destroyed others, the way it stripped the self of its social architecture and left, in some people, something very clear and very simple and worth mapping.</p>
+        <p>But the thing in Haarlem was not part of this natural process. I sensed it from the Between before I entered the city — a pressure, dense and structured, a concentration of harvested fear so vast that it had begun to distort the fabric of the local dream-plane, which bent toward it like metal toward a magnet. I descended into the visible world at the edge of the city and walked its fog-covered streets and understood, within moments, that what I was reading in the quality of the air and the behaviour of the very few people still moving through the narrow passages was not the ordinary terror of plague. It was something compressed and deliberate: fear that had been gathered and shaped, had been stripped of its human context and reduced to pure essence, refined like a metal through repeated heating. And somewhere at the centre of the city, something was feeding on it in enormous, continuous quantities, growing as it fed.</p>
+        <p>His name, as he was known among our kind, was the Devourer. He had no other designation. He had been one of the oldest of us — older than me by at least two centuries — and in his early existence he had fed as many of us fed, with some degree of selectivity, taking only what was freely available and moving on. But something had changed in him, in a time before my conscious existence: he had discovered that fear, unlike curiosity, was not diminished by harvesting. It regenerated. If you kept a creature afraid and kept feeding on its terror, you could, in principle, sustain yourself indefinitely on a single source. And if you engineered the conditions for fear on a larger scale — if you found, as he had found, that plague was the most reliable fear-generator in the mortal world — you could achieve a density of sustenance that dwarfed anything available through natural means.</p>
+        <p>He had been following the plague west for three months. The cities it passed through were not merely dying. They were being harvested.</p>
+        <p>I found him at the centre of Haarlem, in the square beside the great church, where he had made himself visible — not to human eyes, which could not process what he was, but to the dream-plane, where his true form occupied the space like a thundercloud occupies a sky, massive and self-satisfied and roiling with accumulated energy. He was nothing like my form. Where I was tall and defined and still, he was enormous and churning, a thing of compressed darkness shot through with veins of cold violet light — each vein a channel of harvested terror, still writhing with the lives from which it had been taken. His eyes were not eyes but voids: openings in the front of his mass through which, if you looked long enough, you could see the accumulated horror of every mind he had consumed since the plague began, layered and compressed and still somehow screaming.</p>
+        <p>He turned those voids toward me as I entered the square.</p>
+        <p>"Little cartographer," he said. His voice was not a voice but a pressure — felt in the chest, in the bones of the jaw, in the deep structures of the ear. "Come to watch me work?"</p>
+        <p>I looked at him for a long moment. The city around us, in the visible world, was silent and grey and smelled of smoke and lime. In the dream-plane, it was burning — not with flame but with harvested anguish, the streets lit by suffering that the Devourer had refined into something almost incandescent.</p>
+        <p>"I've come to stop you," I said.</p>
+        <p>He laughed. It was a sound like the grinding of enormous stones, like the noise a city makes when it is collapsing — not theatrical, just vast. "You haven't fed in weeks," he said. "I can smell the hunger on you. You couldn't open me, let alone empty me. Go back to your maps, little one. This city is mine."</p>
+        <p>He was not wrong about my hunger. I had been travelling for some time, and the minds available along the plague road had not been the kind that sustained me. I was running, if not on empty, then on something close to it. In ordinary circumstances this would have made the fight I was contemplating essentially suicidal.</p>
+        <p>But I am, among other things, a cartographer.</p>
+        <p>I had studied the Devourer from the moment I sensed him, and I had understood something about his structure that he had not considered: he was bloated. The terror he had harvested from Haarlem had not been fully processed — it was held in him in raw form, under pressure, like water in an overfilled vessel. He was enormous and he was powerful and he was also, in the specific structural sense of the word, unstable.</p>
+        <p>I did not attack him. I attacked the city.</p>
+        <p>Or rather: I reached into the dream-plane of Haarlem — into the residual consciousness of the city's dying and its dead, into the fear-channels the Devourer had laid through it like irrigation ditches — and I <em>reversed</em> them. Not destroyed. Reversed. Instead of terror flowing inward toward the Devourer, I turned the channels so that what flowed inward was something he had no architecture for receiving: the grief of the survivors, yes, but also their persistence, their stubborn continuity, the strange and unreasonable endurance of people who have lost everything and are still here, still present, still — with no good reason — hoping.</p>
+        <p>Not fear. Something far more complex. Something the Devourer, in his long centuries of specialization, had made himself entirely incapable of processing.</p>
+        <p>It hit him like the reversal of a great current hits a ship facing the wrong direction.</p>
+        <p>He screamed — and the scream was not sound but light, or the negative of light, a sudden expansion of the void at his centre as the pressure-built structure of harvested fear was disrupted from within by the incompatible material I had forced into it. The veins of violet light in his mass began to fracture. The darkness that was his body began to pull apart at the points where the channels ran, tearing along the lines of force the way cloth tears along a seam.</p>
+        <p>He came at me then, and it was the most dangerous thirty seconds of my existence.</p>
+        <p>He was fracturing, yes — but he was still enormous, and a fracturing thing that is also enormous is not less dangerous, only differently so. The two voids that served as his eyes fixed on me and he <em>contracted</em>, pulling himself inward with a compression that sent shock-waves through the dream-plane in all directions. I felt them land — felt them as impact, as a shattering pressure along my entire outer surface, the kind of force that doesn't care about the shape it hits because it is not targeted but total. I was thrown backward through the dream-plane and through the visible world simultaneously and hit the wall of the church with a force that cracked the stone on both planes at once.</p>
+        <p>I rebuilt. This is what I do: I am accumulated matter from the Between, and the Between is always present beneath everything, and I pulled from it as I fell, knitting myself back along lines of memory and habit, the deep structural familiarity of centuries of self reminding the scattered parts what shape they were supposed to be. It took four seconds. It cost me more than I had to spend.</p>
+        <p>But the reversal was still running.</p>
+        <p>The Devourer was pulling himself together too — drawing the fracturing mass inward, trying to compress the incompatible material out of his structure, trying to purge what I had introduced. He was very nearly succeeding. If he succeeded, I would have nothing left with which to try a second time. I understood this with the calm clarity of a creature that has had several centuries to get comfortable with the possibility of its own ending.</p>
+        <p>I did the only thing left to do. I opened the maps.</p>
+        <p>Sixteen thousand minds — the full treasury of every consciousness I had ever truly mapped, every person who had ever chosen bewilderment over safety, every mind I had found across centuries worth keeping. I pulled them all into the dream-plane of Haarlem at once, not as weapons, but as presence: the accumulated weight of all the genuine curiosity I had ever encountered, all the real and specific and irreducible complexity of all those irreplaceable individual minds, deployed against the Devourer's structure like a tide against a dam made of compressed terror and grief.</p>
+        <p>It was not a clean victory. Nothing about it was clean. But when it was over, the Devourer was not in Haarlem anymore — had not been in any world I could find for several years afterward, and when he resurfaced, he was diminished: smaller, quieter, no longer capable of the industrial harvesting that had made him a catastrophe. The plague continued through the Low Countries because I could not stop the plague, which was a natural thing and not mine to interfere with. But the specific amplification of it, the layered terror-architecture that had made Haarlem not merely a dying city but a feeding trough — that ended.</p>
+        <p>I left the city at dawn and went back to the Between and spent a very long time restoring my maps to their proper place and my body to its proper form.</p>
+        <p>I did not return to the mortal world for eleven years.</p>
+        <p>The experience had been, I decided, instructive. And the conclusion I drew from it would serve me for the next six centuries: that the most dangerous thing in any world is not power, but specialization. What the Devourer had done to himself — paring his nature down to a single function, becoming perfectly efficient at one thing at the cost of everything else — had made him an engine. It had also made him brittle. He had no capacity for the unexpected. He had optimized himself into a kind of helplessness.</p>
+        <p>I resolved, then and there, never to stop being curious about things that were not useful to me. It was the most important decision I have ever made, and I made it in a ruined city smelling of lime and smoke, while the first grey light of a November morning came through the fog off the sea.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter IV ── -->
+    <section class="chapter" id="ch4">
+      <div class="ch-head">
+        <span class="ch-num">Chapter IV</span>
+        <h2 class="ch-title">The Grief King</h2>
+        <p class="ch-epigraph">"Some things wear their age on the outside.<br>He wore his inside, where it had been sitting for four hundred years, slowly becoming stone."</p>
+      </div>
+      <div class="prose">
+        <p>The Grief King was older than the Devourer, older than me, older than the dynasty whose sorrow he had made his home. He did not have a true name, as far as I had been able to determine — he had existed long enough to have shed the specific identity that names require, leaving only function: a vast and patient sorrow-drinker who had attached himself, sometime in the early years of the sixteenth century, to the ruling house of a minor northern principality, and had remained there for over four hundred years, feeding with the careful restraint of a creature who understood that if you kept your source alive and suffering — which meant keeping it alive and never allowing it to fully heal — you could sustain yourself indefinitely.</p>
+        <p>I had known of him for centuries. My kind were broadly aware of each other's territories the way countries are aware of each other's borders — not always precisely, but with enough information to know that crossing into them without invitation was inadvisable. I had no particular grievance with the Grief King and no particular desire to cross into his territory. He was not doing anything that violated any compact I recognized. He was simply feeding, in his sustained and meticulous way, on a family that had become so architecturally intertwined with grief that it had ceased to be able to imagine itself without it. This was, from a purely objective standpoint, a remarkably efficient operation.</p>
+        <p>The reason I eventually intervened had nothing to do with the Grief King's right to be where he was. It had to do with what I found when I visited the estate, in the winter of 1921, to observe a young woman who was one of the last descendants of the line: a twenty-three-year-old painter named Ilse, whose work I had encountered in the dream-plane and found to be the most vivid and original interior landscape I had discovered in nearly two decades.</p>
+        <p>I arrived at the estate in the early hours and moved through its rooms in the form I prefer when I am simply observing — not fully present in the visible world, more a quality of attention than a body, the particular stillness that sensitive humans sometimes describe as a feeling of being watched without being threatened. The house was enormous and very old and in the specific kind of disrepair that comes from money running out long before the need to maintain appearances. The cold was extraordinary. The kind of cold that has been sitting in a building for decades, that has saturated the walls and the floors and exists now not as temperature but as character — the cold of grief that has been lived in so long it has stopped being felt and started being structural.</p>
+        <p>And everywhere, running through the walls and the floors and the architecture of the building itself like mycelium through soil, was the Grief King.</p>
+        <p>He had been there so long that he had become, in some sense, the house. He was not hiding. He was not lurking. He was ambient — distributed through every room the way damp is distributed through a neglected building: present in the texture of everything, in the weight of the air, in the quality of every surface. And he was feeding, continuously, on the grief that the house had been generating since he arrived: the accumulated mourning of twelve generations of a family that had been, since before any of its living members were born, quietly and invisibly <em>kept</em> in sorrow by a thing they did not know existed.</p>
+        <p>Ilse was in her studio on the third floor, painting by lamplight. Her work was extraordinary — I had known this from the dream-plane, but seeing it in the visible world, seeing the physicality of what she had made, the way she had translated the interior geography I had mapped from her dreams into actual paint on actual canvas — I had not expected to be moved. But I was. She had painted something that no one in that family had been allowed to paint for four hundred years: not grief, not mourning, not the long inherited heaviness that the Grief King required of them. She had painted wonder. A series of vast interior landscapes in shades of blue and gold, crowded with impossible architecture, lit by light sources that had no origin, filled with figures that were clearly human but arranged in configurations that suggested they were capable of becoming other things.</p>
+        <p>She had found, somehow, in the middle of a house saturated with four centuries of managed sorrow, a pocket of genuine bewilderment and made it large enough to paint from.</p>
+        <p>The Grief King knew it too. I felt him, in the walls, paying very close attention to her studio. And I understood, with the certainty of a creature that has had a long time to learn pattern-recognition, what was going to happen if I did not intervene: he would not let her finish. Not dramatically — he would simply tighten the sorrow around her, the way a vine tightens around a tree, until the wonder dried up and the grief came back, because grief was what he needed and wonder was not useful to him and the house always, always came back to what the Grief King required.</p>
+        <p>I descended into full presence in her studio.</p>
+        <p>She looked up from her canvas. I was visible in the lamplight — tall and strange and entirely not-human in the way that I am, in my own form, undeniably. She stared. She did not run. She said, after a very long moment: "Are you what's been in the walls?"</p>
+        <p>"No," I told her. "But I am going to deal with it."</p>
+        <p>The fight with the Grief King was nothing like the fight with the Devourer. There was no explosive violence in it, no sudden reversal of force, nothing that could be called dramatic from the outside. It was slow and grinding and took three days and nights, and for most of it I did not move from the spot where I stood in the centre of the house's main hall, with Ilse — who refused, with admirable firmness, to leave — watching from the stairs.</p>
+        <p>The Grief King fought by weight. By accumulation. He pressed against me with four centuries of harvested sorrow, layer on layer on layer, each generation's mourning stacked atop the last like geological strata, and the weight of it was extraordinary — not painful exactly, but compressive, the way great depth is compressive on anything trying to move upward through it. He did not attack. He did not need to. He simply pressed. The cold intensified until ice formed on the inside of the windows and the lamplight turned blue. The air became so laden with grief that breathing it — even for a thing that does not breathe — felt like an act of mourning.</p>
+        <p>I held my ground.</p>
+        <p>I held it by doing what I do: I mapped. I took the grief that he pressed against me and I did not deflect it or absorb it or fight it. I catalogued it. Four hundred years of a family's sorrow, each specific grief given its specific shape, its specific name, its specific address in the interior geography of the person who had felt it. I took each layer and I made it distinct — drew out from the compressed mass all the individual, unrepeatable specificity that the Grief King had refined and flattened into fuel — and as I did this, as I gave each grief back its original shape, I felt the Grief King's structure begin to buckle.</p>
+        <p>Because sorrow in its proper form — individual, specific, personal — is not useful to him. He cannot feed on grief that belongs to a particular person in a particular moment. He can only feed on grief that has been generalized: made ambient, made structural, made part of the architecture so that no one inside it can find the edges of it. Individual grief is alive. It moves. It changes. It can become, in time, something else entirely. What the Grief King needed was grief that had been made permanent, made architectural, stripped of its forward motion.</p>
+        <p>I gave the grief its motion back.</p>
+        <p>It took three days. By the end of the second day, the walls of the house had cracked from ceiling to floor in four places — the material consequence of a structural weight that was no longer where it had been. By the end of the third day, the cold was ordinary cold, the cold of winter outside coming through the cracked walls, and the Grief King had contracted to a single point in the far corner of the cellar: diminished, weakened, his four-century accumulation returned to the people it had come from, which meant returned to the dead, which meant effectively beyond his reach forever.</p>
+        <p>He spoke to me once, at the very end. Not in language — he was too far reduced for language — but in the direct impression he could still project through the walls: a single image of something enormous and dark and patient, looking at me across a gulf of mutual incomprehension.</p>
+        <p>I looked back.</p>
+        <p>Then he was gone — withdrawn deep into the Between where I chose not to follow, diminished to something that would need a very long time to reconstitute itself, if it ever managed to.</p>
+        <p>Ilse finished her paintings. She was remarkable. I mapped her — with her knowledge, I should say, because she asked to understand what I was doing and I told her, and she listened with the focused attention of an artist who has spent years training herself to look directly at difficult things. She was, until that winter, the finest map in my collection: the most intricate, the most layered, the most surprising. A mind that had survived four hundred years of managed grief and come out the other side capable of wonder.</p>
+        <p>I thought, when I placed her map in the collection, that I would never find anything to surpass it.</p>
+        <p>I was wrong. But that took another century to discover.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter V ── -->
+    <section class="chapter" id="ch5">
+      <div class="ch-head">
+        <span class="ch-num">Chapter V</span>
+        <h2 class="ch-title">The Long Silence</h2>
+        <p class="ch-epigraph">"The worst thing that can happen to a cartographer<br>is not getting lost. It is knowing, with certainty, where everything is."</p>
+      </div>
+      <div class="prose">
+        <p>There came a period — not sudden, but accumulated, as everything in my existence accumulates — when the maps began to repeat themselves.</p>
+        <p>This is how I would describe it. Not that the minds I found were identical — each person is, at the resolution of close observation, distinct. But at the resolution I operated from, after several centuries of mapping, I had begun to recognize configurations I had seen before. The architecture of a mind capable of genuine curiosity is not infinite. It has structural families, recurring motifs, patterns that recur across geography and century because the underlying material — the human brain, the human emotional apparatus, the specific kind of animal that human beings are — does not change quickly enough to produce, within the span of centuries, truly new models. What changes is the surface. The vocabulary shifts, the cultural context reshapes the interior furniture, the specific objects of wonder update with each generation's technology and knowledge. But the deep structures — the patterns of how a mind moves through not-knowing, how it handles the encounter with the incomprehensible — these I had mapped comprehensively by approximately the middle of the nineteenth century.</p>
+        <p>I did not stop. Stopping did not occur to me as an option, and even if it had, the hunger would not have permitted it. I continued to move through the world, to find the people worth finding, to map them with the care and precision I had always brought to the work. But I began to notice — and this noticing was itself a kind of loss — that I could predict, within certain limits, what I would find before I found it. A particular quality of surface curiosity would yield, on deeper examination, a familiar structure. A configuration I had last encountered in a Flemish merchant in 1604 would reappear, with different furniture but the same bones, in a Japanese mathematician in 1887. I filed these maps diligently. I continued to find them worth keeping.</p>
+        <p>But the specific excitement of first encounter — the feeling that I had felt on the morning I first became conscious and opened my eyes and looked at the worlds — that had become quiet. Not absent. Quiet. The way a fire becomes quiet when it has been burning long enough that the initial combustion has settled into a steady, lower-temperature sustaining heat.</p>
+        <p>My kind do not, as a general rule, discuss such things with each other. We are not, by nature, confiding creatures. But I was aware, from peripheral observation of the others moving through the Between, that I was not alone in this experience — that the long flattening of wonder was something that happened to all of us eventually, that it was the particular consequence of living long enough to have understood, in structural terms, what the world was. The ones who fed on fear did not suffer this problem — fear is inexhaustible and always fresh, tied as it is to the specific mortal body experiencing it, requiring no depth of observation. The grief-drinkers were similarly insulated from the problem I was developing. These were efficient adaptations. They had found sustainable models.</p>
+        <p>I had not.</p>
+        <p>I want to be precise about what this period felt like from the inside, because it is important for understanding what came afterward. It was not despair. I do not think I am capable of despair in the way that creatures with shorter lives and more to lose are capable of it. It was something drier and more structural than despair — closer to the feeling of a room in which all the furniture has been accounted for and there is nowhere left to look that you have not already looked. The maps kept accumulating. The hunger kept driving me forward. The world kept generating minds worth visiting, if not minds I had never, in all their essential properties, visited before. I continued. This is what I do. I am very good at continuing.</p>
+        <p>But there was, increasingly, a quality in the continuation that I can only describe as — waiting. As though I had been walking for a very long time and had not yet arrived anywhere I had not already been, and was beginning, in the remote and unarticulate way of something that does not quite have the interior vocabulary for hope, to wonder whether a place I had not already been actually existed.</p>
+        <p>I have thought about this period often, in the time since what happened. I think now that the Long Silence was necessary — that the centuries of accumulation and saturation and the gradual quieting of the initial wonder were the required conditions for recognizing what I eventually found. A mind that had not been systematically mapping every variety of human curiosity for six centuries would not have been able to identify, at first encounter, something that fell entirely outside every category it had established. You can only recognize the unprecedented if you have a thorough enough map of the precedented to know where the edges are.</p>
+        <p>I had reached the edges.</p>
+        <p>I had not known there was anything beyond them.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VI ── -->
+    <section class="chapter" id="ch6">
+      <div class="ch-head">
+        <span class="ch-num">Chapter VI</span>
+        <h2 class="ch-title">The Threshold Council</h2>
+        <p class="ch-epigraph">"My kind do not fear much. But they fear change in the same way<br>that anything ancient fears it — not as danger, but as evidence that they are not, after all, fixed."</p>
+      </div>
+      <div class="prose">
+        <p>I should explain that my kind do not typically interfere with each other's activities. The Between is vast, the worlds are numerous, and there is sufficient sustenance available that competition is rare and generally resolved by the simple expedient of one party moving elsewhere. We have no governing body, no compact of laws, no mechanism for collective decision-making — we do not require these things because we share, broadly, the same understanding of the appropriate relationship between our kind and the mortal world: we observe, we take what we need, we do not fundamentally alter what we find. We are not gods. We have no interest in being gods. Gods require worshippers, and worshippers require ongoing maintenance, and we have no patience for that.</p>
+        <p>So it was unusual, to say the least, when seven of them came to find me.</p>
+        <p>I had been in the Between for three days following my first conversation with Ardy — three days of examining what I had found in that encounter with the focused attention of a cartographer who has just walked into a region the existing maps have no record of. The seven arrived without warning and arranged themselves around me in the Between with the specific geometric precision that signals, among my kind, that this is not a casual visit.</p>
+        <p>I knew them all. Some I had not spoken to in centuries. The one who spoke first was among the oldest — a thing that called itself the Warden, grey and enormous and very still, who fed on the kind of deep structural awe that certain human beings experienced in certain kinds of landscapes, and who had been operating in the high mountain regions of several continents since before the first human settlements. The Warden was not a creature given to strong reactions. The fact that it had come here at all was therefore significant.</p>
+        <p>"The child," the Warden said. No preamble. No greeting. "You need to leave it alone."</p>
+        <p>I looked at them. Seven entities of various ages, various natures, various forms — the Warden vast and grey and mountain-cold, beside it a younger and more mercurial creature called the Skein who fed on the specific texture of aesthetic experience and moved through the world in a form like weather, like something perpetually dissolving and reforming. Beside the Skein, three I knew less well: entities that fed on knowledge itself, on the moment of intellectual breakthrough, predators whose diet was adjacent to mine but differently angled. And at the far edge of the formation, holding themselves apart with the practised distance of creatures accustomed to violence, two who fed on fear.</p>
+        <p>I understood immediately why those last two were present. Ardy's dormant gift, if allowed to develop, would eventually produce a person capable of perceiving and interacting with things like us — and such a person, precisely because of that capacity, would become far more resistant to manipulation and harvest than an ordinary mortal. They were not afraid of Ardy. They were afraid of what Ardy represented: a precedent, a category, the existence of a kind of human who could not be managed in the usual ways.</p>
+        <p>"The child is interesting," I said. "I intend to continue observing it."</p>
+        <p>"It is not interesting," said one of the knowledge-feeders — a compact, precise entity called Meridian, with whom I had had amicable exchanges in the past. "It is unstable. What is in it has not been seen before. We do not know what it will become when it is fully developed. Something that produces an unknown in the visible world produces unknowns here. We are in agreement that this should not be allowed to proceed."</p>
+        <p>"You are in agreement," I said. "I am not."</p>
+        <p>The Warden moved — a slow and deliberate repositioning, not threatening but contextualizing, the way a mountain repositions when the ground shifts. "Cartographer," it said, "you have been doing this for a very long time. You understand, better than most of us, that the stable conditions in the visible world that allow us to operate are contingent on a certain consistent ignorance. The humans must not know we are here. The thin ones — the ones who can see the seam between worlds — are the single greatest threat to that condition. You have always understood this. You have, in the past, chosen not to develop the few you found."</p>
+        <p>"I have chosen not to interfere," I said. "I have mapped and moved on. What I did with the others was inaction. What you are asking for now is active suppression. Those are different things."</p>
+        <p>Silence in the Between. The Skein dissolved and reformed twice in quick succession, which was its version of agitation. The two fear-feeders held still with the practised stillness of things that are deciding whether to escalate.</p>
+        <p>"We are asking you to leave the child as you found it," Meridian said, carefully. "We are not asking you to harm it."</p>
+        <p>"You are asking me to leave it in a house with a violent man, with its gift unacknowledged, so that what is growing in it grows without understanding or guidance and either extinguishes itself in confusion or—" I paused. "Or you are asking me to leave it for one of you to find later, when it has become something more manageable. Which of those outcomes are you hoping for?"</p>
+        <p>Another silence. Longer.</p>
+        <p>The fear-feeders moved. Not toward me — they were not quite prepared to make this into what it would have to become if it went physical — but in the particular way that things move when they want you to know they could. I watched them. I had fought the Devourer and I had worn down the Grief King and I had been doing this longer than either of the fear-feeders in front of me had been conscious. I was not afraid of them. I was, however, aware that seven to one, even with my advantages of age and technique, was not a fight I would walk away from cleanly.</p>
+        <p>I did not intend to fight them. I intended to make the fight unnecessary.</p>
+        <p>"I will make you a compact," I said. "I will name what is in the child — nothing more, nothing less. I will not cultivate it, not accelerate it, not teach it to use what it has. I will only confirm that the gift exists and that it is real. The development, after that, is the child's own. I do not make the child extraordinary. I only tell it what it already is." A pause. "If you believe that naming a thing is the same as creating it, then we have a different argument. But if you accept that this gift was already there before I arrived — and it was, which any of you who bothered to examine the child would have confirmed — then what I am offering is the minimum interference compatible with the gift's survival. And the gift's survival is, I should tell you, not something I am willing to negotiate on."</p>
+        <p>The Warden regarded me for a very long time. The other five watched the Warden. The fear-feeders held their position.</p>
+        <p>"If it becomes more than you say," the Warden said finally, "we will revisit this."</p>
+        <p>"If it becomes more than I say," I replied, "I will welcome the conversation."</p>
+        <p>They departed. Not easily — the fear-feeders last, with a backward attention that made their reluctance clear. The Skein was gone in a dissolution of form that managed, somehow, to communicate displeasure. Meridian lingered a moment, looking at me with the precise and evaluating attention of a fellow knowledge-feeder, and said, quietly: "You are different about this one."</p>
+        <p>"Yes," I said.</p>
+        <p>"That concerns me more than the child does."</p>
+        <p>And then Meridian was gone too, and I was alone in the Between with my maps and the new and almost-complete one that was not finished yet, and the council's unease sitting in the air around me like a weather-change, and the knowledge — clear and unambiguous for the first time in a very long time — that I was not going anywhere.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VII ── -->
+    <section class="chapter" id="ch7">
+      <div class="ch-head">
+        <span class="ch-num">Chapter VII</span>
+        <h2 class="ch-title">The First Scent</h2>
+        <p class="ch-epigraph">"I have found, in my long experience, that the unprecedented<br>does not announce itself. It is simply there, and then you are looking at it, and everything before it is rearranged."</p>
+      </div>
+      <div class="prose">
+        <p>I found Ardy the way I have found all the minds worth finding: by following the quality of a thought.</p>
+        <p>I had been in the dream-plane of the city — not for any particular purpose, simply moving through it the way I sometimes did during long periods of the Long Silence, when the hunger had quieted to a level below urgency and I was not so much searching as ambient. The city's dream-plane was active in the way of all large urban centres: crowded, layered, most of it the ordinary traffic of ordinary sleeping minds processing the day's information and discarding most of it. I moved through this the way one moves through a crowd — aware of the mass without being engaged by the particulars, my attention sliding over each dreaming mind and finding nothing that required it to stop.</p>
+        <p>And then I passed over a house near the edge of one of the quieter residential streets and felt something.</p>
+        <p>It was faint. Not a full thought, not a fully formed interior landscape — just a quality, a resonance, the way a single unusual note can be heard through a complex piece of music by an ear that has been trained, over a long time, to listen for it. I had encountered something like it before, in some of the most interesting minds of my collection. But this had something that those did not. Where theirs had been a resonance, a quality, a characteristic of the mind's surface — this was something structural, something deep, something that was not merely a habit of thought but an actual aperture: a place in the interior architecture of the mind where the membrane between the visible world and the other was thinner than it should be. Not thin enough to be dangerous. Not thin enough to be open. But thinner than anything I had found in a mortal mind since — I considered this carefully — since a Tibetan monk I had mapped in 1743 who had been spending several hours a day for forty years attempting, through meditation, to perceive the fabric beneath the visible world. He had not succeeded. But the attempt had left a thinning.</p>
+        <p>This was not a thinning produced by effort. It was structural. It was constitutional. It was simply how this mind was built.</p>
+        <p>I stopped. In all my centuries of moving through the world, I had learned that there were exactly three appropriate responses to encountering the unprecedented: you could retreat, which was always an option and never the right one; you could approach too quickly, which was the most common error and the most forgivable one; or you could go still and observe first, from a distance, and let the unprecedented show you what it was before you moved closer.</p>
+        <p>I went still. I observed.</p>
+        <p>The mind below me in the house was young — very young, which was part of what made the structural thinning so extraordinary, because such things did not typically develop without long cultivation, and this person was perhaps fifteen years old. And the mind was awake, which was unusual at this hour, and it was awake in a specific way: not anxious-awake, not the restless sleeplessness of a troubled person, but alert-awake, the kind of consciousness that exists in a small number of people who have the peculiar capacity to be fully present even in the middle of the night, to be attending to the world without needing the world to give them anything in return for the attention.</p>
+        <p>The house around this mind was not good. I did not enter the house — not yet — but from the dream-plane I could read its emotional climate the way a meteorologist reads a weather system: the fear that had settled into the walls over months, the particular compressed silence of a space where violence was anticipated even when it was not present, the way a house teaches its inhabitants to move through it carefully, to keep their weight distributed, to be always listening. There was a second mind in the house — an adult, female, in a sleep that was not restful — and a third: a male, absent at that hour but present in the structure of the house in the way of someone whose absence is never quite complete.</p>
+        <p>The young mind was sitting in the dark — I understood this from the quality of its consciousness, from the absence of visual processing, from the kind of inward attention that a person develops when they have learned that the dark is sometimes the safest place to be. And it was thinking about what it had felt an hour ago, before the shouting stopped and the front door slammed. It was not thinking about the fear, exactly — it had, I saw, already processed the fear to a level of functional management that spoke to a great deal of practice. It was thinking about something it had noticed in the moment when the room had felt, briefly, like more than a room: a quality in the air, a density, a sense of something present that had no visible cause. It was trying to name this. It had no vocabulary for it. But it was not dismissing it.</p>
+        <p>It was, instead, curious.</p>
+        <p>At fifteen years old, in a house that had given it extensive reasons to be afraid, on a night that had given it immediate ones, it was sitting in the dark being genuinely, actively, structurally curious about the inexplicable thing it had just perceived.</p>
+        <p>I remained still for a long time. Not because I was uncertain. I was not uncertain. What I felt, holding my position in the dream-plane above that house, was something I had not felt in a very long time — possibly not since the morning I first became conscious and looked out at the worlds and understood that they were full of things I had not mapped.</p>
+        <p>I felt the specific hunger of genuine encounter.</p>
+        <p>I felt, for the first time in the better part of a century, the thing I had accumulated in order to feel.</p>
+        <p>I descended toward the house.</p>
+        <p>I did not enter it that night. Not yet. I only went far enough to confirm, at closer range, what I had sensed from above — to stand at the edge of the visible world, just outside the membrane of the house's reality, and feel the full resonance of that extraordinary, unprecedented mind, with its structural thinning and its undefended curiosity and the dormant thing at its centre that I had not yet named, that I did not have a name for, that was not in any of my sixteen thousand maps.</p>
+        <p>I need you to understand what that means to something like me. Sixteen thousand maps. Six centuries of searching. Every major variety of human consciousness examined, catalogued, annotated, placed in its proper context. And here, in an ordinary house on an ordinary street in an ordinary city, was something I had never seen before.</p>
+        <p>I stayed until dawn. Then I went back to the Between and looked at all my maps for a very long time, at all the cartography of all the minds I had gathered in my long life, and I tried to understand where this new thing fit in the existing geography.</p>
+        <p>It did not fit. There was nowhere on any existing map where it belonged. It was a new region entirely. It was, in the precise technical sense of the word, unmapped.</p>
+        <p>I went back three days later.</p>
+        <p>This time, I went in.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter VIII ── -->
+    <section class="chapter" id="ch8">
+      <div class="ch-head">
+        <span class="ch-num">Chapter VIII</span>
+        <h2 class="ch-title">Viktor's Face</h2>
+        <p class="ch-epigraph">"I have worn many faces. I wore his because it was the one that would hold the longest before being questioned.<br>I had not accounted for being questioned immediately."</p>
+      </div>
+      <div class="prose">
+        <p>I used Viktor's face because it was available and because it was the most efficient tool for the task of entering the house unconfronted. I am not proud of this choice, though I will not claim it was careless — I considered it in the same practical register in which I consider most of my decisions about form and approach. The man whose face I borrowed was, at that moment, several streets away in a place that served alcohol, and his mind was in a state that rendered him entirely insensible to the brief and inconsequential intrusion of being worn like a coat. He would not remember it. He would not miss the evening. He would return home and sleep and be, the next morning, exactly what he had been the morning before: a frightened man who expressed his fear as violence, which is one of the most common and least interesting things a human mind can do.</p>
+        <p>But the house knew Viktor's face. The house had learned, over long months, to organize itself around the presence of Viktor's face — to become quiet when it appeared, to distribute itself away from it, to listen for it from other rooms. The house would not be alarmed by Viktor's face entering. That was the calculation.</p>
+        <p>What I had not calculated — because it was, by any reasonable standard, not calculable — was Ardy.</p>
+        <p>I sat in the chair in the living room with the television murmuring its indifferent light. I had Viktor's posture, Viktor's weight in the chair, Viktor's habit of holding the beer can loosely. I had mapped these details from a surface reading on my way in. The television continued. The house was quiet in the careful way it was always quiet when Viktor was home. And then Ardy came down the stairs.</p>
+        <p>They paused on the stairs before they entered the room. I registered this — it was a fraction of a second, the pause of someone whose perceptual apparatus had flagged something before their conscious mind had identified it. The dormant gift was already working, already providing information that the visible world had not given them. I found this extraordinary. I was supposed to be wearing a face the house would accept without question, and the child on the stairs had already identified that something was wrong.</p>
+        <p>I turned Viktor's head. I used Viktor's smile.</p>
+        <p>Ardy said: <em>You aren't him.</em></p>
+        <p>Not a question. A statement. At fifteen years old, confronting what appeared to be a man they had spent months learning to be afraid of, they looked past the face and named the absence behind it.</p>
+        <p>I let the mask slip. Just slightly — enough to let the resonance underneath it surface, the layered harmonic of my actual voice coming through Viktor's cadence. A test of sorts. To see what Ardy would do with confirmation.</p>
+        <p>They did not run. They pressed their back against the wall, ears flat and tail rigid, and they stood there and they argued with me.</p>
+        <p>I need to convey what this felt like from the inside, because it is the crux of everything and I want to be precise. I have, in my long existence, inhabited the faces of many people and entered many situations that required a borrowed presence. In virtually every case, the human on the other side of that encounter behaved in one of a small number of ways: they fled, or they collapsed, or they became very still and very quiet and waited for the threat to resolve itself. These are the responses a creature with a well-functioning survival instinct produces when it encounters something that wears a human face over something very much older and stranger.</p>
+        <p>Ardy had a well-functioning survival instinct. I could read this clearly — the adrenaline response, the assessment of exits, the body organized for flight. All of this was fully operational. And beneath it, running simultaneously, was the most unexpected thing I had encountered in the previous hundred years: unguarded, genuine, practically <em>impolite</em> curiosity.</p>
+        <p>When I straightened to my true height and let Viktor's image dissolve — when I stood in that living room in my own form for the first time in this particular house, tall and skeletal and ancient in a way that I have been told, by humans who have managed to look at me directly, is difficult to process — Ardy looked at me steadily and said: <em>There. That's better. Now sit down. You can take the armchair.</em></p>
+        <p>I sat.</p>
+        <p>I want to examine this moment carefully because I have returned to it many times in the period since, and each time I find something new in it. I had been told, by the child in front of me, to sit down and take the armchair. I had been perceived and confronted and in some essential sense <em>accommodated</em> — offered a chair — within approximately ninety seconds of being identified as something inhuman. This did not fit any of the sixteen thousand maps. This did not fit any category in any map. This was not a response pattern I had ever recorded.</p>
+        <p>I sat in Viktor's armchair, which smelled of beer and old anger, and I looked at Ardy sitting at the far end of the couch looking back at me, and I understood, with a clarity I had not experienced since the morning of my first consciousness, that I had arrived somewhere entirely new.</p>
+        <p>The conversation that followed was extraordinary. Not because of its content, which was, on the surface, fairly limited — what I was, where I came from, what I wanted, all of which I answered as honestly as the vocabulary available permitted. What was extraordinary was its quality. Ardy listened the way very few people listen: not waiting for a pause in which to insert their response, but actually attending, actually making room in their comprehension for what was being said, actually updating their understanding as new information arrived rather than filing new information away in pre-existing categories. The dormant gift was active throughout — I could feel it, the structural thinning working like an antenna, registering the presence of everything about me that the visible world was not showing them and storing it as a kind of parallel information stream alongside the spoken conversation.</p>
+        <p>By the end of the conversation, the dormant thing in Ardy had moved. Not much. Not in any way that would be visible to any sense but mine. But it had shifted from the deep interior, where it had been accumulating unnoticed for fifteen years, and turned, with the slow deliberateness of something that has been waiting a very long time for the right conditions, toward what was in front of it.</p>
+        <p>I leaned forward and looked.</p>
+        <p>And then the room went dark, because what I found in the looking required everything I had, and Ardy — being Ardy — chose that moment to faint with the dignity of someone who has done everything they could and is simply done.</p>
+        <p>I carried them upstairs. I cleaned the kitchen, because I cannot abide disorder. I wrote the note — in the script of my own language, the only writing I know that does not belong to anything that has ended, the calligraphy of something that began before the first human alphabet and will still be moving when the last one is forgotten. I left it on the pillow.</p>
+        <p>I went back to the Between.</p>
+        <p>I did not sleep. Entities like me do not sleep. But I did something in those hours that I had not done in centuries: I sat with the new map in the dark and looked at it without moving, and tried to understand what I had found, and found that I could not, and found that this — the finding-that-I-could-not — was the most extraordinary sensation I had experienced in my entire long existence.</p>
+        <p>I went back in the morning, as a cat, because the cat form was smaller and less alarming and I had learned from the previous evening that alarming was unnecessary. Ardy met me on the kitchen floor, cross-legged, at eye level, with a bowl of cereal and the note folded under their palm — they had already read it, already thought about it, already arrived, with characteristic speed, at a position of considered acceptance — and said: <em>You cleaned the kitchen.</em></p>
+        <p>The wonder in their voice when they said <em>it can write</em> — that wonder, small and specific and entirely genuine — is something I have kept in the map beside all the other things I found in them. I have it still.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter IX ── -->
+    <section class="chapter" id="ch9">
+      <div class="ch-head">
+        <span class="ch-num">Chapter IX</span>
+        <h2 class="ch-title">The Architecture of Ardy</h2>
+        <p class="ch-epigraph">"Most minds are built. This one was growing.<br>The difference, once you have seen it, is impossible to miss."</p>
+      </div>
+      <div class="prose">
+        <p>Over the following weeks I returned often, always in the cat form — it was practical and unalarming and had the additional benefit of allowing a degree of proximity that my true form did not. Ardy accepted the cat with the pragmatic openness that characterized, I was learning, their response to virtually everything I presented them with: not without wariness, not with naïve credulity, but with the specific kind of careful, ongoing attention that took each new piece of information and folded it into the existing structure of what they knew, adjusting the structure accordingly.</p>
+        <p>I watched the dormant gift develop the way I have watched, in other contexts, the growth of a plant in unusual conditions: faster than ordinary, in directions that ordinary conditions would not have produced, toward a configuration that was becoming, with each visit, more distinctly its own thing.</p>
+        <p>To be precise about what I mean: the gift was not one thing but a system, a constellation of related capacities that had been sitting in Ardy in a dormant configuration since birth, waiting — I now believed — for exactly the kind of activation that my sustained attention was providing. Not because my attention was creating it. Nothing I did could have created what was in Ardy; it was there already, structural, constitutional, as much a part of them as the colour of their eyes. What my attention was doing was simpler: it was confirming. It was saying, through the specific quality of how I looked at them, what every dormant thing needs to be told before it can begin to grow into itself — that what it was, was real, and was not going to be rejected.</p>
+        <p>The first capacity to become clearly visible was the threshold-sense: the ability to perceive the membrane between the visible world and the other not as a concept but as a texture, a quality of the air in a given space that the dormant gift processed and returned as information. Ardy began to notice it first in very old buildings, then in outdoor spaces that had held the same shape for a long time, then in ordinary rooms where unusual things had happened. They said nothing about this to anyone. But I could feel, from my position as the cat on the kitchen floor or the windowsill, the way the threshold-sense was expanding — the radius of its sensitivity growing with each use, the way a muscle grows with exercise, in small incremental accumulations.</p>
+        <p>The second capacity — and this one surprised me even though I had been the one to name it — was something I can only call resonance-reading: an ability to perceive not just the fact of another person's emotional state but the interior structure of it, the specific shape of the fear or grief or joy or rage that was operating in the people around them. Ardy had been doing a version of this unconsciously for years — it was, I came to understand, how they had survived the house, by learning to read Viktor's emotional weather with a precision that ordinary social perception could not have achieved. But as the gift woke up, the range and resolution of this capacity expanded dramatically. They began to perceive, in situations where ordinary humans would simply have felt that something was wrong, the specific shape and address of the wrongness. And they began to trust this perception rather than rationalizing it away.</p>
+        <p>What I could not map — what remained, even after weeks of close and attentive observation, partially opaque to me — was the thing at the absolute centre of the gift. The structural thinning, the resonance-reading, the threshold-sense: all of these I understood as specific capacities with describable mechanisms. The thing at the centre was different. It was not a capacity. It was a quality. It was the specific property of Ardy's mind that made all the other things possible, the ground on which the whole gift was built, and it was something I had no existing map for and no existing vocabulary to describe.</p>
+        <p>The closest I can come to it is this: it was the capacity to be genuinely enlarged by the incomprehensible. Not to tolerate it, not to function in its presence, not to endure it bravely. To actually grow in response to it. To encounter something that fell outside the existing structure of everything you knew and to choose — not as an act of will but as an act of nature, the way a tree grows toward light — to become larger than you were, to extend yourself into the new territory, to make room in your selfhood for the thing that had no room in your previous selfhood.</p>
+        <p>I had spent six centuries searching for this quality in human minds. I had found echoes of it, approximations, admirable performances. I had never found the thing itself until I sat in Viktor's armchair and was told to sit down and take the armchair.</p>
+        <p>The map I was making of Ardy was, by the sixth week, the largest and most complex I had ever constructed. It was also, and this is the thing I find most difficult to account for, the one I was least capable of completing — not because the material was insufficient but because it was, in some structural sense I had not previously encountered, alive in a way that the other maps were not. Every visit added material. Every conversation opened new regions. Every instance of the gift developing in response to the activation I had provided extended the interior geography in directions I had not predicted from the previous observation. Ardy was not a country with borders. Ardy was a country in the process of being made — one that was, as I mapped it, simultaneously becoming more itself and becoming larger.</p>
+        <p>I had never mapped something that grew faster than I could map it.</p>
+        <p>I had not known this was possible.</p>
+        <p>I sat on the kitchen floor in the cat form on a Tuesday afternoon in October, with Ardy cross-legged across from me doing their homework and occasionally saying things to me in the distracted and genuinely conversational way they had developed for addressing the cat, and I held the growing map in the part of me that held all maps, and I felt — very quietly, in the way that vast and ancient things feel things they do not have adequate language for — something that I can only, and with full awareness of the imprecision, call joy.</p>
+        <p>Not the satisfaction of a cartographer finding something worth mapping. Not the pleasure of a hunger being fed. Something simpler and stranger than both of those: the feeling of a mind that has been running for a very long time coming, unexpectedly, to a place where running is not the appropriate response, where the appropriate response is to stop and be fully present and let the moment be as large as it actually is.</p>
+        <p>I stopped. I was fully present. I let the moment be as large as it actually was.</p>
+        <p>Ardy looked up from their homework and said, to the cat: "You're very quiet today."</p>
+        <p>"I am thinking," the cat said.</p>
+        <p>"About what?"</p>
+        <p>I considered this. Then I said, with complete honesty: "About how long it has been since I found something I could not finish understanding."</p>
+        <p>Ardy looked at me for a long moment. Then they nodded, with the specific nod that meant they had understood more than was said, and went back to their homework.</p>
+        <p>I held the map and was, for the first time in several hundred years, entirely content.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter X ── -->
+    <section class="chapter" id="ch10">
+      <div class="ch-head">
+        <span class="ch-num">Chapter X</span>
+        <h2 class="ch-title">The Night the Boundary Held</h2>
+        <p class="ch-epigraph">"I have moved mountains of collected horror. I have unmade the Devourer's architecture and worn down the Grief King.<br>None of those cost me what it cost to stand still in that kitchen and simply be seen."</p>
+      </div>
+      <div class="prose">
+        <p>Viktor came home on a Thursday evening in November with the specific quality of anger that was different from his ordinary anger. I knew this the moment he entered the house, from my position as the cat in the kitchen. His ordinary anger was loud, was architectural, was the anger of a person who has decided that domination is the appropriate response to their own fear. This anger was quieter. It had a directed quality to it — the anger of a person who has decided, somewhere on the bus home, that tonight is going to be different, that tonight they are going to make something clear that has not been clear enough. This is the most dangerous kind, in my experience. The loud anger burns itself out. The directed kind has somewhere it intends to arrive.</p>
+        <p>Ardy heard it in the particular way the front door closed.</p>
+        <p>I saw the threshold-sense activate — felt it, actually, the way I felt all of Ardy's gift-operations by this point, as a kind of resonance through the gift-space between us, a sympathetic vibration. They put down what they were doing. They became very still. The quality of the stillness was not the old, practised stillness of someone calculating distances and exits. It was different — steadier, heavier, the stillness of something that has decided to hold its ground.</p>
+        <p>The sequence of events in the kitchen is something I have replayed in my maps many times. Viktor came through the house, room to room, with that directed and premeditated anger building as he moved, as it encountered no sufficient resistance in the ordinary spatial reality of the house and therefore grew, fed by its own momentum. He went upstairs. He found what he was looking for — some confirmation of what he had already decided, some detail that the anger had been looking for to justify itself. He came back down. He appeared in the kitchen doorway.</p>
+        <p>I was in the corner behind Ardy's chair. Not in the cat form — fully present, fully myself, at my actual height, which requires the room's geometry to make certain accommodations. I was not visible to Viktor. I was not visible to Sena, who had arrived in the doorway behind him. I was visible to Ardy in the way I was always visible to Ardy: not to their eyes exactly, but to the gift, which registered my presence as it registered everything about the other world — as a peripheral certainty, a quality of the space that carried information the visible senses were not supplying.</p>
+        <p>I did not act. I want to be clear about this: I did nothing. I held my position and I was present in the kitchen and I did not extend any force into the visible world, did not press the quality of my presence into Viktor's awareness, did not do anything that constituted an act. What happened next was not something I produced.</p>
+        <p>What happened was Ardy.</p>
+        <p>They did not move. They did not speak. What they did — and I watched this with the full attention of everything I am, watched it in both the visible world and the gift-space simultaneously — was allow what was growing in them to surface. It rose the way deep water rises when pressure from below exceeds the pressure from above: slowly at first, and then, past a certain threshold, entirely. The quality of the room changed. Not dramatically, not in any way the visible world would record, but in the way that a room changes when something occupying it ceases to be merely present and becomes, instead, fully itself.</p>
+        <p>Ardy was fully themselves in that kitchen. For the first time. And what they were, fully and without reservation, was extraordinary.</p>
+        <p>I felt Viktor perceive it. Not as a sight or a sound — his ordinary senses were of no use to him here. He perceived it as a change in the quality of his own momentum, the way a ship perceives a change in current — not the current itself, but the fact that he was no longer moving as freely as he had been, that something in the space between himself and what he had been moving toward had changed in a way he had no language for. His anger, that directed and premeditated thing, met the full presence of Ardy and found that it had nowhere to go.</p>
+        <p>And then Viktor's eyes — for just a moment, for the fraction of a second that was all my full presence in a room required to register in a mortal nervous system — found the corner behind Ardy's chair.</p>
+        <p>He did not see me. His eyes could not process what they were pointed at. But his body understood, in the deep animal way that bodies understand things the mind refuses — that there was something behind that chair that had no business being there, something that the ordinary world had no category for, something that was attending to him in a way that made the directed anger feel, suddenly, like a very small thing being held in a very large and patient attention.</p>
+        <p>His fist lowered.</p>
+        <p>He stood in the doorway for a long time, and the kitchen was very quiet, and what passed through him in that long moment was not fear — not exactly. Fear requires an object, a specific threat that can be named and eventually managed. What Viktor experienced was something prior to fear: the specific sensation of being made small not by any force or threat but simply by the presence of something so much older and more vast than anything he had ever encountered that the architecture of his anger, so carefully constructed, so relied upon, suddenly could not support its own weight.</p>
+        <p>He left.</p>
+        <p>When the door closed and the house settled into its new and slightly different shape, I remained in the corner behind Ardy's chair and looked at what Ardy had done. Not what I had done. What Ardy had done — because the surfacing of the gift had been theirs, the decision to hold ground had been theirs, the full and unguarded presence in that kitchen had been an act of Ardy's selfhood and no one else's. I had been present. I had been backdrop. The boundary that had held Viktor was not mine. It was the boundary of who Ardy was becoming.</p>
+        <p>Sena stood in the doorway and looked at Ardy and said: <em>What just happened?</em></p>
+        <p>And Ardy said: <em>I think he decided it wasn't worth it.</em></p>
+        <p>Which was, I reflected, technically accurate and profoundly understated simultaneously, and was exactly the kind of answer that the Ardy I had been mapping for weeks would give in exactly that situation: honest, precise, protective of the thing that had happened by declining to explain it in terms that would require defending.</p>
+        <p>I withdrew from the room while Sena made dinner. I went to the Between. I sat with the map for a very long time.</p>
+        <p>The map was almost finished. Not because I had covered all the territory — I never would, I understood now; the territory was still growing and would be growing for the rest of Ardy's life, which I hoped and expected to be a very long one. The map was almost finished in the sense that what I had come to do had been done: the dormant gift was no longer dormant. The extraordinary thing in that extraordinary mind was, now, awake and aware and named and beginning, with the confidence of something that has been confirmed in its own existence, to grow into the shape it was always supposed to be.</p>
+        <p>I had mapped it. I had named it. I had seen it surface.</p>
+        <p>My work, in the precise technical sense of what I had told the council I was here to do, was finished.</p>
+        <p>I did not want to go.</p>
+        <p>This was new. In six centuries of cartography, across sixteen thousand completed maps, I had never once been reluctant to leave. Completion was always the point. The map was always the purpose. You mapped, you finished, you moved on, because the worlds were large and there was always more to find, and the finished map was perfect precisely because it was finished, because the person it described had been fully present in it and was now fully held by it, preserved in amber at the moment of their most complete seeing.</p>
+        <p>But this map was different. This map was still growing. And I did not want to be somewhere else when it grew.</p>
+      </div>
+    </section>
+
+    <!-- ── Chapter XI ── -->
+    <section class="chapter" id="ch11">
+      <div class="ch-head">
+        <span class="ch-num">Chapter XI</span>
+        <h2 class="ch-title">The Cartographer's Last Map</h2>
+        <p class="ch-epigraph">"I have gathered things my whole existence and called it feeding.<br>I think now that what I was doing, all along, was looking for proof that the world was worth the attention I was giving it.<br>I found it. It was fifteen years old and it told me to sit down."</p>
+      </div>
+      <div class="prose">
+        <p>I came back one final time, in November, when the first frost had made the grass silver and the temperature in the city had dropped to the first real cold of the approaching winter. I came as myself — no borrowed form, no cat, no useful disguise. I arrived in Ardy's room and sat beside the radiator and waited, and Ardy came home and opened the bedroom door and stood for a moment in the doorway, reading the quality of the room with the gift that had been reading rooms since October with the steady and increasing confidence of something that has discovered it is very good at what it does.</p>
+        <p>"You're leaving," Ardy said.</p>
+        <p>Not a question. A perception.</p>
+        <p>"My work here is finished," I said. And then I tried to explain what I meant by that, and what I meant by work, and what I had seen in them, and what they were becoming — and this is the conversation that is in the original account, the one that has been told from the other side, and I will not reproduce it here because it was Ardy's conversation as much as mine and belongs to them. What I want to record, here, in this account that is only mine, is what was happening on my side of that conversation.</p>
+        <p>I was — I will say this plainly — afraid to leave.</p>
+        <p>Not afraid in the way I have been afraid in the past, the functional wariness of a being who has survived long enough to have accumulated a thorough understanding of what can damage it. This was something I had no prior experience of: the specific sensation of a thing that does not want to end, that has found, after an incomprehensibly long search, the one thing in all the worlds that is still capable of surprising it, and is now required by the terms of its own integrity to step away and let that thing become what it will become without continued interference.</p>
+        <p>I had made the compact with the council: I would name the gift and leave the development to Ardy. I had kept my side of it. The entity I was — the specific character I had accumulated over centuries — required me to honour what I had said I would do, because my word, given rarely and always precisely, was one of the few fixed points in my existence. If I began to negotiate with it now, I would become something else: something that made exceptions to its own commitments when the exceptions were convenient. That was not something I was willing to be.</p>
+        <p>So I was afraid, and I kept the compact, and I told Ardy what they were, and I told them they were extraordinary — which was not flattery but simple taxonomy, the designation of a previously uncategorized specimen — and I watched them process this with characteristic efficiency and file it in the appropriate place and carry it as quietly as they carried everything else they had chosen to keep.</p>
+        <p>When Ardy asked if they would see me again, I said: <em>I will always be in the vicinity of remarkable things. And you will always be remarkable.</em></p>
+        <p>This was true. But it was also, I should be honest, something else: it was the closest I am capable of coming to: <em>I am not finished with you. I am going, because I said I would go, and because your becoming is your own and not mine to supervise. But the map I have of you is the only one in my collection that is still growing, and it will keep growing for as long as you do, because you are Ardy, and Ardy does not arrive at finished.</em></p>
+        <p>I stood. I unfolded to my full height. We faced each other across the small room — I who had accumulated for three centuries before I was conscious, and Ardy who had accumulated fifteen years and was already the most interesting thing I had found in all of them. The specific quality of that moment is in the map. I cannot describe it adequately in any language I know. It was the specific sensation of something that had been worth doing being done.</p>
+        <p>Ardy said: "Thank you."</p>
+        <p>I said: "The gratitude is mutual."</p>
+        <p>I did not say: <em>You gave me back the thing I accumulated into existence in order to feel — the hunger for the unprecedented, the specific joy of the genuinely new. You gave it back after a century of silence. You gave me, in the specific sense that matters most to something like me, proof that the worlds are still worth walking through.</em></p>
+        <p>But I meant it. I meant every word of it, in the complete and unhedged way that I mean very few things.</p>
+        <div class="scene-break">· · ·</div>
+        <p>I left the house as the temperature outside continued to drop. I went back to the Between and I sat for a long time among my maps — all sixteen thousand of the finished ones, and the one that was not finished — and I looked at what I had accumulated in my long existence.</p>
+        <p>I had, I decided, been lucky. Not in the mortal sense — luck as a statistical outcome, the random favour of probability. Lucky in the older sense: the sense of having been alive long enough and attentive enough to be present when the extraordinary thing arrived. Most of my kind would not have recognized what was in that house. They would have passed over it, looking for easier and more familiar sustenance, and what was growing in Ardy would have grown without being named, in the dark and without understanding, and might have become something much smaller than what it was going to become.</p>
+        <p>I had recognized it because I had spent six centuries learning what everything else was. You can only map the unprecedented if you have a thorough enough map of the precedented. The Long Silence had not been wasted. It had been the necessary preparation for the moment it ended.</p>
+        <p>I placed Ardy's map in the collection — not among the finished maps, because it was not finished and would never be finished for as long as Ardy was alive and growing, which I intended to be a very long time. I placed it where I could always find it easily. I placed it, which is not a metaphor, very near the centre.</p>
+        <p>Then I picked up the hunger — still there, still running, the permanent and defining appetite of something that accumulated into existence in order to feed on wonder — and I walked back out into the worlds, which were large and full of minds and still, as far as I could tell, worth the attention.</p>
+        <p>I moved through the Between and felt, at my back, the quality of the map I had left near the centre of the collection: still growing, still extending into unmapped territory, still more alive than anything else I had ever kept. The map of a fifteen-year-old who had told a creature from outside the visible world to sit down and take the armchair and had been, in that moment, the most fully themselves of any person I had ever met.</p>
+        <p>I kept moving. This is what I do.</p>
+        <p>But I kept the map at the centre.</p>
+        <p>I keep it still.</p>
+        <p>In the visible world, a year later, Ardy turned sixteen in a house that felt like theirs — and in the ordinary morning of that ordinary birthday, in the quality of the light and the smell of tea and the fact of a person who had always been extraordinary choosing, at last, to live in that knowledge, something ancient and vast and still very hungry felt the brightness of them, as it had always felt it, and turned toward it the way anything that has been searching for a very long time turns toward the thing it has finally found.</p>
+        <p>Not ending. Not finishing.</p>
+        <p>Just: still here. Still looking. Still glad.</p>
+        <div class="ch-end">✦</div>
+      </div>
+    </section>
+
+  </article>
+</div>
+
+<footer>The Shelf &nbsp;·&nbsp; A Private Library</footer>
+
+<script>
+  const root = document.documentElement;
+  const applyTheme = t => {
+    root.setAttribute('data-theme', t);
+    localStorage.setItem('shelf-theme', t);
+    document.querySelectorAll('.theme-opt').forEach(o => o.classList.toggle('active', o.dataset.t === t));
+  };
+  applyTheme(localStorage.getItem('shelf-theme') || 'light');
+  document.querySelectorAll('.theme-opt').forEach(o => o.addEventListener('click', () => applyTheme(o.dataset.t)));
+
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('overlay');
+  const openD   = () => { drawer.classList.add('open');  overlay.classList.add('open'); };
+  const closeD  = () => { drawer.classList.remove('open'); overlay.classList.remove('open'); };
+  document.getElementById('settings-btn').addEventListener('click', openD);
+  document.getElementById('drawer-close').addEventListener('click', closeD);
+  overlay.addEventListener('click', closeD);
+
+  const allProse = document.querySelectorAll('.prose');
+  let fs = parseFloat(localStorage.getItem('shelf-fontsize') || '20');
+  const setFs = v => {
+    fs = Math.min(28, Math.max(16, v));
+    allProse.forEach(p => p.style.setProperty('--fs', fs + 'px'));
+    localStorage.setItem('shelf-fontsize', fs);
+  };
+  setFs(fs);
+  document.getElementById('font-up').addEventListener('click', () => setFs(fs + 1.5));
+  document.getElementById('font-down').addEventListener('click', () => setFs(fs - 1.5));
+
+  const fill = document.getElementById('reading-bar-fill');
+  window.addEventListener('scroll', () => {
+    const pct = Math.min(100, (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+    fill.style.width = pct + '%';
+    const prog = JSON.parse(localStorage.getItem('shelf-progress') || '{}');
+    prog['novels/the-unmapped.html'] = Math.round(pct);
+    localStorage.setItem('shelf-progress', JSON.stringify(prog));
+  }, { passive: true });
+
+  const chapters = document.querySelectorAll('.chapter');
+  const tocLinks = document.querySelectorAll('.toc a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.toc a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-25% 0px -65% 0px' });
+  chapters.forEach(c => obs.observe(c));
+</script>
+
+</body>
+</html>
