@@ -347,8 +347,8 @@
     <span class="intro-eyebrow">Your Library</span>
     <h1 class="intro-title">Stories worth<br><em>reading.</em></h1>
     <div class="stats">
-      <div><span class="stat-num">7</span><span class="stat-lbl">Novels</span></div>
-      <div><span class="stat-num">57</span><span class="stat-lbl">Chapters</span></div>
+      <div><span class="stat-num">8</span><span class="stat-lbl">Novels</span></div>
+      <div><span class="stat-num">59</span><span class="stat-lbl">Chapters</span></div>
     </div>
   </div>
 
@@ -359,9 +359,29 @@
     <button class="chip" data-filter="horror">Horror</button>
     <button class="chip" data-filter="comedy">Comedy</button>
     <button class="chip" data-filter="romance">Romance</button>
+    <button class="chip" data-filter="tragedy">Tragedy</button>
   </div>
 
   <div class="card-list">
+
+    <a class="card" href="novels/yellow.html" data-genres="tragedy slice-of-life">
+      <div class="card-thumb">
+        <span class="thumb-text">Yellow</span>
+      </div>
+      <div class="card-info">
+        <div class="card-tags">
+          <span class="ctag">Tragedy</span>
+          <span class="ctag">Coming of Age</span>
+        </div>
+        <h2 class="card-title">Yellow</h2>
+        <p class="card-desc">He always wore yellow. He said it was the colour of being brave. Two voices. Two summers. A letter left in a rock at the bottom of a reservoir. No way back.</p>
+        <div class="progress-track"><div class="progress-fill" id="prog-8" style="width:0%"></div></div>
+        <div class="card-row">
+          <span class="card-meta">2 Chapters · Complete</span>
+          <span class="card-cta">Read</span>
+        </div>
+      </div>
+    </a>
 
     <a class="card" href="novels/the-bet.html" data-genres="slice-of-life romance">
       <div class="card-thumb">
@@ -372,8 +392,6 @@
           <span class="ctag">Slice of Life</span>
           <span class="ctag">Romance</span>
           <span class="ctag">18+</span>
-          <span class="ctag">This novel was indeed a mistake!! im sorry!!!!!</span>
-          <span class="ctag">This novel is a commission! please don't think bad about me!</span> 
         </div>
         <h2 class="card-title">The Bet</h2>
         <p class="card-desc">It began as a stupid summer wager — one Ardy had rigged from the start. It ended with everything he hadn't known to want. A story about losing on purpose.</p>
@@ -538,6 +556,8 @@
 
   // Reading progress
   const prog = JSON.parse(localStorage.getItem('shelf-progress') || '{}');
+  const p8 = document.getElementById('prog-8');
+  if (p8) p8.style.width = (prog['novels/yellow.html'] || 0) + '%';
   const p7 = document.getElementById('prog-7');
   if (p7) p7.style.width = (prog['novels/the-bet.html'] || 0) + '%';
   const p1 = document.getElementById('prog-1');
