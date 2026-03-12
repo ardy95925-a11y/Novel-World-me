@@ -48,59 +48,155 @@
     /* ── Age Gate ── */
     .age-gate {
       position: fixed; inset: 0; z-index: 9999;
-      background: #08090d;
+      background: #04050a;
       display: flex; align-items: center; justify-content: center;
-      flex-direction: column;
       padding: 40px 28px;
-      transition: opacity 0.5s;
+      transition: opacity 0.6s ease;
     }
     .age-gate.dismissed { opacity: 0; pointer-events: none; }
+
     .gate-inner {
-      max-width: 420px; width: 100%;
+      max-width: 460px; width: 100%;
       text-align: center;
-      display: flex; flex-direction: column; align-items: center; gap: 22px;
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+      border: 1px solid rgba(180,100,100,0.18);
+      background: #07080e;
+      padding: 48px 40px 40px;
     }
-    .gate-label {
-      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.45em;
-      text-transform: uppercase; color: rgba(180,160,200,0.35);
+
+    .gate-stripe {
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, #8b1a1a, #3b1a2a, #8b1a1a);
+      margin-bottom: 36px;
     }
+
+    .gate-logo {
+      font-family: 'Cinzel', serif; font-size: 8.5px; letter-spacing: 0.5em;
+      text-transform: uppercase; color: rgba(200,150,150,0.3);
+      margin-bottom: 28px;
+    }
+
+    .gate-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 1px solid rgba(180,100,100,0.3);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      color: rgba(200,120,120,0.6);
+      font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300;
+    }
+
     .gate-title {
       font-family: 'Cormorant Garamond', serif; font-weight: 300;
-      font-size: clamp(38px, 9vw, 60px); line-height: 1; color: #e8e0d0;
-      letter-spacing: 0.04em;
+      font-size: 46px; line-height: 1; color: #e8ddd0;
+      letter-spacing: 0.08em; margin-bottom: 8px;
     }
-    .gate-rule {
-      width: 48px; height: 1px; background: rgba(180,160,200,0.18);
+
+    .gate-subtitle {
+      font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.4em;
+      text-transform: uppercase; color: rgba(200,120,120,0.45);
+      margin-bottom: 28px;
     }
+
+    .gate-divider {
+      width: 100%; height: 1px;
+      background: rgba(180,100,100,0.12);
+      margin-bottom: 28px;
+    }
+
     .gate-text {
-      font-family: 'EB Garamond', serif; font-size: 17px; font-style: italic;
-      color: rgba(200,190,180,0.55); line-height: 1.7; max-width: 340px;
+      font-family: 'EB Garamond', serif; font-size: 16px; font-style: italic;
+      color: rgba(200,185,175,0.45); line-height: 1.75; margin-bottom: 28px;
     }
-    .gate-warning {
-      font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.28em;
-      text-transform: uppercase; color: rgba(180,100,100,0.6);
-      border: 1px solid rgba(180,100,100,0.2); padding: 8px 16px;
+
+    .gate-dob-label {
+      font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.35em;
+      text-transform: uppercase; color: rgba(200,175,165,0.4);
+      display: block; margin-bottom: 12px; text-align: left; width: 100%;
     }
-    .gate-btns { display: flex; gap: 10px; width: 100%; }
-    .gate-btn {
-      flex: 1; padding: 14px 10px; border: 1px solid;
+
+    .gate-dob {
+      display: flex; gap: 8px; width: 100%; margin-bottom: 10px;
+    }
+
+    .gate-select {
+      flex: 1; background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(180,100,100,0.2);
+      color: rgba(220,205,195,0.7);
+      font-family: 'EB Garamond', serif; font-size: 15px;
+      padding: 10px 8px; outline: none; cursor: pointer;
+      transition: border-color 0.2s;
+      appearance: none; -webkit-appearance: none;
+      text-align: center;
+    }
+    .gate-select:focus { border-color: rgba(180,100,100,0.5); }
+    .gate-select option { background: #0f0e14; color: #d0c5bb; }
+
+    .gate-error {
+      font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.25em;
+      text-transform: uppercase; color: rgba(220,80,80,0.8);
+      min-height: 20px; margin-bottom: 16px; text-align: center;
+      display: none;
+    }
+    .gate-error.visible { display: block; }
+
+    .gate-confirm {
+      width: 100%; padding: 16px;
+      background: rgba(140,40,40,0.15);
+      border: 1px solid rgba(180,80,80,0.3);
+      color: rgba(220,200,190,0.85);
       font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em;
       text-transform: uppercase; cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.2s, border-color 0.2s;
+      margin-bottom: 12px;
     }
-    .gate-btn-yes {
-      background: rgba(180,160,200,0.08); border-color: rgba(180,160,200,0.25);
-      color: #e8e0d0;
+    .gate-confirm:hover { background: rgba(160,50,50,0.25); border-color: rgba(200,100,100,0.4); }
+    .gate-confirm:disabled {
+      opacity: 0.3; cursor: not-allowed;
+      background: rgba(80,80,80,0.1);
+      border-color: rgba(120,120,120,0.15);
     }
-    .gate-btn-yes:hover { background: rgba(180,160,200,0.16); }
-    .gate-btn-no {
-      background: none; border-color: rgba(180,100,100,0.2);
-      color: rgba(200,150,150,0.5);
+
+    .gate-leave {
+      background: none; border: none;
+      font-family: 'EB Garamond', serif; font-size: 14px; font-style: italic;
+      color: rgba(180,160,150,0.25); cursor: pointer;
+      transition: color 0.2s; padding: 4px 0;
+      text-decoration: underline; text-underline-offset: 3px;
     }
-    .gate-btn-no:hover { background: rgba(180,100,100,0.06); }
-    .gate-sub {
-      font-family: 'EB Garamond', serif; font-size: 13.5px;
-      color: rgba(180,160,200,0.2); line-height: 1.6;
+    .gate-leave:hover { color: rgba(200,140,130,0.4); }
+
+    .gate-legal {
+      margin-top: 20px;
+      font-family: 'Cinzel', serif; font-size: 7.5px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: rgba(160,140,130,0.18);
+      line-height: 1.8; text-align: center;
+    }
+
+    /* ── Redact / Reveal ── */
+    .r {
+      display: inline;
+      background: #1a1612;
+      color: transparent;
+      border-radius: 2px;
+      cursor: pointer;
+      user-select: none;
+      filter: blur(4px);
+      transition: filter 0.25s ease, background 0.25s ease, color 0.25s ease;
+      padding: 0 2px;
+    }
+    .r:hover { filter: blur(2px); background: #2a2018; }
+    .r.open {
+      background: transparent;
+      color: inherit;
+      filter: none;
+      cursor: default;
+    }
+    .redact-hint {
+      display: block;
+      font-family: 'Cinzel', serif; font-size: 7.5px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--muted); opacity: 0.5;
+      text-align: center; margin: -0.5em 0 1.8em;
+      user-select: none;
     }
 
     /* ── Nav ── */
@@ -212,16 +308,35 @@
 <!-- ── Age Gate ── -->
 <div class="age-gate" id="age-gate">
   <div class="gate-inner">
-    <span class="gate-label">The Shelf · Restricted Content</span>
-    <h1 class="gate-title">18+</h1>
-    <div class="gate-rule"></div>
-    <p class="gate-text">This novel contains explicit sexual content between adult characters. It is intended for mature readers only.</p>
-    <div class="gate-warning">Adults Only · Explicit Content</div>
-    <div class="gate-btns">
-      <button class="gate-btn gate-btn-yes" id="gate-yes">I am 18 or older — Enter</button>
-      <button class="gate-btn gate-btn-no" id="gate-no">I am under 18 — Leave</button>
+    <div class="gate-stripe"></div>
+    <div class="gate-logo">The Shelf · Restricted Access</div>
+    <div class="gate-icon">⚠</div>
+    <h1 class="gate-title">Adults Only</h1>
+    <p class="gate-subtitle">Explicit Sexual Content · 18+</p>
+    <div class="gate-divider"></div>
+    <p class="gate-text">This novel contains explicit sexual content intended for mature readers. You must be 18 years of age or older to continue.</p>
+    <span class="gate-dob-label">Enter your date of birth to verify your age</span>
+    <div class="gate-dob">
+      <select class="gate-select" id="gate-month" aria-label="Month">
+        <option value="">Month</option>
+        <option value="1">January</option><option value="2">February</option>
+        <option value="3">March</option><option value="4">April</option>
+        <option value="5">May</option><option value="6">June</option>
+        <option value="7">July</option><option value="8">August</option>
+        <option value="9">September</option><option value="10">October</option>
+        <option value="11">November</option><option value="12">December</option>
+      </select>
+      <select class="gate-select" id="gate-day" aria-label="Day">
+        <option value="">Day</option>
+      </select>
+      <select class="gate-select" id="gate-year" aria-label="Year">
+        <option value="">Year</option>
+      </select>
     </div>
-    <p class="gate-sub">By entering you confirm you are of legal age in your jurisdiction to view adult content.</p>
+    <div class="gate-error" id="gate-error"></div>
+    <button class="gate-confirm" id="gate-confirm" disabled>Verify Age &amp; Enter</button>
+    <button class="gate-leave" id="gate-no">I am under 18 — leave this page</button>
+    <p class="gate-legal">By entering you confirm you are of legal age to view adult content in your jurisdiction. This site does not knowingly permit access to minors.</p>
   </div>
 </div>
 
@@ -473,48 +588,52 @@
         <p class="ch-epigraph">"To be entirely known by someone and chosen anyway — this is the thing.<br>Everything else is footnote."</p>
       </div>
       <div class="prose">
+        <span class="redact-hint">[ explicit words are redacted — tap to reveal ]</span>
         <p>The kiss was unhurried. This was what surprised Ardy most about it — that Aiden, who was impatient at cards and fast at everything that could be done fast, kissed with a kind of careful attention that was its own particular undoing. As if he had been saving it. As if he intended to do it correctly.</p>
         <p>Ardy's tail wound around Aiden's ankle and stayed there.</p>
         <p>They broke apart eventually, both of them breathing differently, the room darker now with the amber faded out of it. Aiden looked at him with something warm and unhurried in his expression — not the careful blankness, not the studied composure, just himself, finally, just his face without the distance.</p>
         <p><span class="tender">"Still want to?"</span> he asked, very quietly.</p>
         <p>"Yeah," Ardy said. "Very much."</p>
         <p>Aiden's answer was to kiss him again, slower this time, one hand curling at the nape of his neck. He drew Ardy closer with a steadiness that left no room for uncertainty — certain himself, thoroughly certain, every movement deliberate and unhurried. His hands at the hem of the nightgown were careful, the way he was careful with things he valued.</p>
-        <p>The nightgown came off. Ardy helped with this, which made Aiden laugh — the same brief, real sound — and then the laughter settled into something quieter and Aiden sat back and looked at him in the dim room with an expression that Ardy had no prior reference for, which was simply want, uncomplicated and undisguised.</p>
+        <p>The nightgown came off. Ardy helped with this, which made Aiden laugh — the same brief, real sound — and then the laughter settled into something quieter and Aiden sat back and looked at him in the dim room with an expression that Ardy had no prior reference for: simply want, uncomplicated and undisguised.</p>
         <p><span class="warmth">"God,"</span> Aiden said, barely a breath. <span class="warmth">"You've been right there. All this time."</span></p>
-        <p>He touched him like that was still the subject — like proximity and years of it were the thing he was trying to reconcile. His hands moved across Ardy's shoulders, his sides, his waist, mapping him with the particular attention of someone who intends to remember. When his thumb brushed across Ardy's chest and his breath caught, Aiden stilled and did it again, deliberate, watching his face.</p>
+        <p>He touched him like that was still the subject — like proximity and years of it were the thing he was trying to reconcile. His hands moved across Ardy's shoulders, his sides, his waist, mapping him with the particular attention of someone who intends to remember. When his thumb brushed across Ardy's <span class="r">nipple</span> and his breath caught, Aiden stilled and did it again, deliberate, watching his face — then <span class="r">pinched lightly, rolling it between his fingers</span> until Ardy made a sound he couldn't contain.</p>
         <p><span class="warmth">"There,"</span> he said, quiet and satisfied. <span class="warmth">"Like that."</span></p>
 
         <span class="thought">I have no useful frame for this. For being touched by someone who already knows what I'm going to say before I say it, who has already seen me at every size and shape of myself and has apparently filed all of it away as information leading to this specific conclusion. He's looking at me like I'm something he worked out. Like I'm a problem he solved. I don't mind. I don't mind at all.</span>
 
-        <p>Aiden kissed his throat, his collarbone, the line of his shoulder, his mouth warm and unhurried, pausing wherever Ardy's breath changed. He was learning him in real time and being entirely unsubtle about it — cataloguing, cross-referencing, entirely focused. It was dizzying in a way Ardy had not anticipated. He said Aiden's name and Aiden made a low, pleased sound against his skin that travelled the length of his spine.</p>
+        <p>Aiden kissed his throat, his collarbone, the line of his shoulder, his mouth warm and unhurried, pausing wherever Ardy's breath changed. He was learning him in real time and being entirely unsubtle about it. It was dizzying. He said Aiden's name and Aiden made a low, pleased sound against his skin that travelled the length of his spine.</p>
         <p>Ardy's hands found his hair, his shoulders, the warm solid reality of him, and held on.</p>
-        <p>When Aiden's hand slid lower and wrapped around him — unhurried, certain, as if he'd decided exactly what he was doing and had allocated adequate time for it — Ardy's hips tilted up without his permission and Aiden's grip tightened and he worked him steadily, watching his face the whole time with an expression of focused, warm attention that was somehow more intimate than the act itself.</p>
-        <p><span class="warmth">"You're not going to last,"</span> Aiden observed, without judgment, almost fond.</p>
+        <p>Then Aiden's mouth moved lower — down his chest, his stomach — and Ardy understood where this was going approximately two seconds before it arrived. <span class="r">Aiden took him in his mouth</span> with the same deliberate, unhurried attention he'd brought to everything else, and Ardy's <span class="r">hips jerked up</span> involuntarily and Aiden's hands pressed them flat and held, and he <span class="r">worked him slowly — lips and tongue, no rush, learning the specific sounds each motion drew out</span> — watching him the whole time with an expression of focused, warm attention that was somehow more intimate than the act itself.</p>
+        <p><span class="warmth">"You're not going to last,"</span> Aiden observed, pulling back for a moment, his voice rough and fond.</p>
         <p>"Aiden—"</p>
         <p><span class="warmth">"I know. I've got you."</span></p>
-        <p>He did have him. Thoroughly. Ardy's fingers tightened in his hair and he said his name again, differently this time — cracked at the edges, undone — and Aiden didn't stop, his rhythm steady and sure, and the room and the evening and the whole long summer collapsed into that single point of sensation until Ardy shuddered apart with Aiden's name still in his mouth, spilling across his own stomach, and Aiden's hand slowed and stilled and he pressed a kiss to his temple with a gentleness that was somehow the most devastating part of any of it.</p>
-        <p>A long, warm silence.</p>
-        <p>Ardy's tail, for the record, had given up any pretence of composure entirely.</p>
-        <p>Aiden looked at it and laughed — a real one, delighted, the laugh he reserved for things that genuinely surprised him — and Ardy would have been embarrassed about this except that Aiden was kissing him again before he could manage embarrassment, and the kiss tasted like that laugh, open and warm, and Ardy reached for him and found him hard and wanting and felt the particular satisfaction of that — of being wanted back, equally, measurably.</p>
-        <p><span class="warmth">"What do you want?"</span> Aiden asked, pulling back just enough to speak. His voice had changed — lower, rougher at the edges, the careful composure gone entirely.</p>
-        <p>Ardy considered the question seriously for a moment. Then: "All of it," he said. "Whatever you want. I mean it."</p>
-        <p>Something moved through Aiden's expression — a flicker of surprise, then something hotter, then the absolute certainty of a person who has received clear instruction and intends to act on it.</p>
-        <p><span class="warmth">"Turn over,"</span> he said.</p>
+        <p>He did have him. Thoroughly. He <span class="r">took him back in, deeper this time</span>, and Ardy's fingers tightened in his hair and he said his name again, differently — cracked at the edges, undone — and Aiden <span class="r">swallowed around him</span> and didn't stop, his rhythm steady and relentless, until Ardy <span class="r">came hard with Aiden's name still in his mouth, shaking apart, his whole body tightening and releasing</span> — and Aiden held him through it with both hands and then pressed a kiss to his hip with a gentleness that was somehow the most devastating part of any of it.</p>
+        <p>A long, warm silence. Ardy's tail had given up any pretence of composure entirely.</p>
+        <p>Aiden looked at it and laughed — real, delighted — and Ardy would have been embarrassed except that Aiden was kissing him again before he could manage it. The kiss tasted like warmth and want and Ardy reached down and <span class="r">found him hard against his thigh, thick and wanting</span>, and felt the particular satisfaction of that — of being wanted back, measurably.</p>
+        <p><span class="warmth">"What do you want?"</span> Aiden asked, voice low and rough. <span class="warmth">"Tell me exactly."</span></p>
+        <p>Ardy considered the question. Then: "All of it," he said. "I want you <span class="r">inside me</span>. I mean it."</p>
+        <p>Something moved through Aiden's expression — surprise, then something hotter, then absolute certainty.</p>
+        <p><span class="warmth">"Turn over,"</span> he said. <span class="warmth">"Hands and knees."</span></p>
         <p>Ardy did.</p>
-        <p>Aiden was patient in a way that cost him something — Ardy could feel it in the careful steadiness of his hands, in the controlled quality of his breathing, in the deliberate pace he maintained when every other signal suggested urgency. He prepared him slowly, thoroughly, attentive to every sound Ardy made and adjusting accordingly, and by the time he finally pressed close and asked — <span class="warmth">"okay?"</span> — his voice rough with restrained want — Ardy's answer was not okay but <em>please</em>, which was more honest.</p>
-        <p>The first press of him was — a lot. Full and deep and unavoidable, and Ardy exhaled sharply into the pillow and Aiden stilled immediately, his hand at his hip, his mouth at the back of his neck.</p>
+        <p>Aiden was patient in a way that cost him something visible — Ardy could feel it in the careful steadiness of his hands, in the controlled quality of his breathing. He worked him open slowly, <span class="r">one finger first, then two, crooking forward to find the spot that made Ardy's thighs shake</span>, and he took his time, adding <span class="r">more slick, pressing deeper, spreading him open</span> with the same thorough attention he'd given everything else, until Ardy was <span class="r">grinding back against his hand and asking — not asking, begging — for more</span>.</p>
+        <p>By the time Aiden finally pressed the <span class="r">blunt head of his cock against him and asked — "okay?" — his voice rough with restrained want</span> — Ardy's answer was not okay but <em>please</em>, which was more honest.</p>
+        <p>The <span class="r">first press of him was a lot — thick and slow and unavoidable, splitting him open by degrees</span> — and Ardy exhaled sharply into the pillow and Aiden stilled immediately, his hand at his hip, his mouth at the back of his neck.</p>
         <p><span class="warmth">"Still with me?"</span></p>
-        <p>"Yes." He was. <em>Very much yes.</em> "Don't stop."</p>
-        <p>Aiden moved.</p>
-        <p>It was slow at first — long, rolling, deliberate strokes that made Ardy's hands fist in the bedding and his breath come ragged, each one landing deep, each one drawing a sound from him that he'd have been embarrassed about in any other context and was not embarrassed about now. Aiden's hand found his hip and held, steadying, guiding, and his other hand slid beneath him and wrapped around him where he was hardening again, already, and the dual attention of it was overwhelming in the specific way of too much that is also exactly enough.</p>
-        <p><span class="warmth">"Ardy,"</span> Aiden said, against his shoulder, rough and close. <span class="warmth">"You feel—"</span></p>
-        <p>"I know," Ardy managed. "I know. Don't stop."</p>
-        <p>Aiden's rhythm built gradually — measured patience finally giving way to something less controlled, his hips finding a deeper pace, the hand around Ardy moving in time. Ardy's tail had abandoned all dignity and was curling and uncurling against Aiden's calf in a rhythm entirely its own, and Aiden made a low sound somewhere between a laugh and a groan at that and drove deeper and Ardy cried out into the pillow and Aiden said his name — just his name, twice, with a weight to it that was not a punishment name or a warning name but a <em>you specifically, no one else, this is yours</em> name — and that, more than anything, was what undid him.</p>
-        <p>He came apart the second time with Aiden still moving inside him, Aiden's hand working him through it, and the sounds he made were entirely outside his control and he didn't care, and Aiden groaned at the clench of him and his composure finally broke entirely — his pace stuttering, his grip tightening, his forehead dropping to Ardy's shoulder as he followed him over the edge with a shuddering, helpless intensity that Ardy felt through his whole body, and then Aiden's weight settled over him and they were both breathing hard into the dark and the room was very quiet and the sea outside went on with its patient, indifferent work.</p>
+        <p>"Yes." <em>Very much yes.</em> "Don't stop. <span class="r">Give me the rest of it.</span>"</p>
+        <p>Aiden <span class="r">pushed in to the hilt</span> with a low groan, both hands gripping Ardy's hips, and held there a moment — just breathed — and Ardy could feel <span class="r">the full stretch of him, deep and overwhelming, his body adjusting around the intrusion</span>.</p>
+        <p>Then Aiden moved.</p>
+        <p>It was slow at first — <span class="r">long, rolling strokes that dragged against the spot inside him</span> and made Ardy's hands fist in the bedding and his breath come ragged, each thrust landing <span class="r">deep enough that he felt it in his stomach</span>, each one drawing a sound from him that he'd have been embarrassed about in any other context. Aiden's hand slid beneath him and <span class="r">wrapped around his cock where he was already hard again</span>, stroking in time, and the dual sensation was overwhelming in the specific way of too much that is also exactly enough.</p>
+        <p><span class="warmth">"Ardy,"</span> Aiden breathed against his shoulder, rough and close. <span class="warmth">"You feel — </span><span class="r warmth">so fucking good, so tight</span><span class="warmth"> —"</span></p>
+        <p>"I know," Ardy managed. "Don't stop. <span class="r">Harder.</span>"</p>
+        <p>Aiden's composure broke. His rhythm built — <span class="r">deeper, faster, the slap of skin filling the room along with the sounds Ardy couldn't suppress, breathy and desperate, a moan with every thrust</span>. His <span class="r">grip on Ardy's cock tightened, working him in long strokes</span>, and Ardy was <span class="r">leaking steadily, soaking Aiden's fist</span>, his whole body coiled toward a second release that was coming whether he was ready for it or not.</p>
+        <p>Aiden said his name — just his name, twice — with a weight to it that was not a warning but a <em>you specifically, no one else</em> name — and leaned down and <span class="r">bit gently at the back of his neck</span>, and that combination — the voice, the bite, the <span class="r">cock driving into him without mercy</span> — was what undid him completely.</p>
+        <p>Ardy <span class="r">came for the second time with Aiden still buried deep inside him, spilling over his fist</span>, and the sounds he made were entirely outside his control, and Aiden <span class="r">groaned at the clench of him and drove in hard one last time and followed — shuddering, helpless, emptying himself</span> with his forehead dropped to Ardy's shoulder and both their names tangled in the same breath.</p>
+        <p>Then his weight settled. The room went quiet. The sea outside went on with its patient, indifferent work.</p>
 
         <span class="scene-break">· · ·</span>
 
-        <p>After, they lay in the half-dark and said very little. Aiden cleaned them both up with the practical tenderness of someone who intended to do this again and had therefore developed an interest in logistics, and then settled with his arm around Ardy's waist and his face against his shoulder, and his breathing had the slow cadence of someone finally at ease — the specific quality of a tension maintained for a long time finally, fully releasing.</p>
+        <p>After, they lay in the half-dark and said very little. Aiden cleaned them both up with the practical tenderness of someone who intended to do this again and had developed an interest in logistics, then settled with his arm around Ardy's waist and his face against his shoulder. His breathing had the slow cadence of someone finally at ease — the specific quality of a tension maintained for a long time fully, finally, releasing.</p>
         <p>Ardy stared at the ceiling and felt something settle in him. Not dramatically. Not with fanfare. Just a quiet internal arrival, the way a long-held note finally resolves.</p>
         <p><span class="tender">"The week of feminine clothes,"</span> Aiden said eventually, muffled against his shoulder. <span class="tender">"Is still happening, by the way."</span></p>
         <p>"I figured."</p>
@@ -568,18 +687,69 @@
 <footer>The Shelf &nbsp;·&nbsp; A Private Library &nbsp;·&nbsp; 18+ Content</footer>
 
 <script>
-  // Age gate
+  // ── Age Gate ──
   const gate = document.getElementById('age-gate');
-  if (sessionStorage.getItem('shelf-age-verified')) {
+
+  if (sessionStorage.getItem('shelf-age-verified') === '1') {
     gate.style.display = 'none';
   }
-  document.getElementById('gate-yes').addEventListener('click', () => {
+
+  // Populate day select
+  const dayEl = document.getElementById('gate-day');
+  for (let d = 1; d <= 31; d++) {
+    const o = document.createElement('option');
+    o.value = d; o.textContent = d;
+    dayEl.appendChild(o);
+  }
+
+  // Populate year select (100 years back from current)
+  const yearEl = document.getElementById('gate-year');
+  const currentYear = new Date().getFullYear();
+  for (let y = currentYear; y >= currentYear - 100; y--) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    yearEl.appendChild(o);
+  }
+
+  const monthEl  = document.getElementById('gate-month');
+  const confirmBtn = document.getElementById('gate-confirm');
+  const errorEl  = document.getElementById('gate-error');
+
+  function checkSelects() {
+    confirmBtn.disabled = !(monthEl.value && dayEl.value && yearEl.value);
+  }
+  [monthEl, dayEl, yearEl].forEach(s => s.addEventListener('change', checkSelects));
+
+  confirmBtn.addEventListener('click', () => {
+    const m = parseInt(monthEl.value);
+    const d = parseInt(dayEl.value);
+    const y = parseInt(yearEl.value);
+    const dob = new Date(y, m - 1, d);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const mDiff = today.getMonth() - dob.getMonth();
+    if (mDiff < 0 || (mDiff === 0 && today.getDate() < dob.getDate())) age--;
+
+    if (age < 18) {
+      errorEl.textContent = 'You must be 18 or older to access this content.';
+      errorEl.classList.add('visible');
+      confirmBtn.disabled = true;
+      setTimeout(() => window.location.href = 'https://www.google.com', 2200);
+      return;
+    }
+
     sessionStorage.setItem('shelf-age-verified', '1');
     gate.classList.add('dismissed');
-    setTimeout(() => gate.style.display = 'none', 550);
+    setTimeout(() => gate.style.display = 'none', 650);
   });
+
   document.getElementById('gate-no').addEventListener('click', () => {
     window.location.href = 'https://www.google.com';
+  });
+
+  // ── Redact toggle ──
+  document.querySelectorAll('.r').forEach(el => {
+    el.addEventListener('click', () => el.classList.toggle('open'));
   });
 
   // Theme
