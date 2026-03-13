@@ -355,11 +355,13 @@
   <div class="filters">
     <button class="chip active" data-filter="all">All</button>
     <button class="chip" data-filter="slice-of-life">Slice of Life</button>
+    <button class="chip" data-filter="found-family">Found Family</button>
     <button class="chip" data-filter="dark-fantasy">Dark Fantasy</button>
     <button class="chip" data-filter="horror">Horror</button>
     <button class="chip" data-filter="comedy">Comedy</button>
     <button class="chip" data-filter="romance">Romance</button>
     <button class="chip" data-filter="tragedy">Tragedy</button>
+    <button class="chip" data-filter="supernatural">Supernatural</button>
   </div>
 
   <div class="card-list">
@@ -390,15 +392,13 @@
       <div class="card-info">
         <div class="card-tags">
           <span class="ctag">Slice of Life</span>
-          <span class="ctag">THIS CONTENT HAS BEEN REMOVED DUE TO MY COMMON SENCE</span>
-          <span class="ctag">1e</span>
-          <span class="ctag">This novel was a commision!! don't think weird about me please!</span>
+          <span class="ctag">Romance</span>
         </div>
         <h2 class="card-title">The Bet</h2>
         <p class="card-desc">It began as a stupid summer wager — one Ardy had rigged from the start. It ended with everything he hadn't known to want. A story about losing on purpose.</p>
         <div class="progress-track"><div class="progress-fill" id="prog-7" style="width:0%"></div></div>
         <div class="card-row">
-          <span class="card-meta">7 Chapters</span>
+          <span class="card-meta">7 Chapters · Complete</span>
           <span class="card-cta">Read</span>
         </div>
       </div>
@@ -562,8 +562,8 @@
   const p7 = document.getElementById('prog-7');
   if (p7) p7.style.width = (prog['novels/the-bet.html'] || 0) + '%';
   const p1 = document.getElementById('prog-1');
-  const p2 = document.getElementById('prog-2');
   if (p1) p1.style.width = (prog['novels/the-unknown-entity.html'] || 0) + '%';
+  const p2 = document.getElementById('prog-2');
   if (p2) p2.style.width = (prog['novels/every-small-thing.html'] || 0) + '%';
   const p3 = document.getElementById('prog-3');
   if (p3) p3.style.width = (prog['novels/room-482.html'] || 0) + '%';
