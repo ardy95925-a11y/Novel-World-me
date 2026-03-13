@@ -347,8 +347,8 @@
     <span class="intro-eyebrow">Your Library</span>
     <h1 class="intro-title">Stories worth<br><em>reading.</em></h1>
     <div class="stats">
-      <div><span class="stat-num">8</span><span class="stat-lbl">Novels</span></div>
-      <div><span class="stat-num">59</span><span class="stat-lbl">Chapters</span></div>
+      <div><span class="stat-num">9</span><span class="stat-lbl">Novels</span></div>
+      <div><span class="stat-num">60</span><span class="stat-lbl">Chapters</span></div>
     </div>
   </div>
 
@@ -362,9 +362,29 @@
     <button class="chip" data-filter="romance">Romance</button>
     <button class="chip" data-filter="tragedy">Tragedy</button>
     <button class="chip" data-filter="supernatural">Supernatural</button>
+    <button class="chip" data-filter="mystery">Mystery</button>
   </div>
 
   <div class="card-list">
+
+    <a class="card" href="novels/the-pale-archive.html" data-genres="mystery tragedy">
+      <div class="card-thumb" style="background: #0e1418; border-color: #1a2430;">
+        <span class="thumb-text" style="color: #4e98ae; letter-spacing: 0.08em;">The<br/>Pale<br/>Archive</span>
+      </div>
+      <div class="card-info">
+        <div class="card-tags">
+          <span class="ctag">Mystery</span>
+          <span class="ctag">Literary Fiction</span>
+        </div>
+        <h2 class="card-title">The Pale Archive</h2>
+        <p class="card-desc">Nadia Voss is a municipal archivist who finds a sealed box that does not exist in any catalog. Inside: 847 letters between two people who both died on the same day in 1962. The letters continue until 1994.</p>
+        <div class="progress-track"><div class="progress-fill" id="prog-9" style="width:0%"></div></div>
+        <div class="card-row">
+          <span class="card-meta">1 Chapter · Ongoing</span>
+          <span class="card-cta">Read</span>
+        </div>
+      </div>
+    </a>
 
     <a class="card" href="novels/yellow.html" data-genres="tragedy slice-of-life">
       <div class="card-thumb">
@@ -557,6 +577,8 @@
 
   // Reading progress
   const prog = JSON.parse(localStorage.getItem('shelf-progress') || '{}');
+  const p9 = document.getElementById('prog-9');
+  if (p9) p9.style.width = (prog['novels/the-pale-archive.html'] || 0) + '%';
   const p8 = document.getElementById('prog-8');
   if (p8) p8.style.width = (prog['novels/yellow.html'] || 0) + '%';
   const p7 = document.getElementById('prog-7');
